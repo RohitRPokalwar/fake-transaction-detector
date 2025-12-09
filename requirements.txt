@@ -1,0 +1,12 @@
+Flask
+pandas
+numpy
+scikit-learn
+python-dateutil
+shap
+lime
+networkx
+matplotlib
+python-louvain
+fpdf
+fpdf

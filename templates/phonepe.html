@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Analyzer // Payment Shield</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/phonepe.css') }}">
+    <!-- Load Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <a href="/" class="back-btn">&larr;</a>
+            <h1>LIVE ANALYZER</h1>
+            <div class="subtitle">Secure Transaction Gateway</div>
+        </div>
+
+        <div style="padding: 20px;">
+            <!-- Amount Input -->
+            <div class="amount-input-group">
+                <label>Amount (USD)</label>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <span style="font-size: 2rem; color: var(--accent-color); margin-right: 5px;">$</span>
+                    <input type="number" id="txnAmount" placeholder="0.00" value="5000">
+                </div>
+            </div>
+
+            <!-- Fields -->
+            <div class="form-group">
+                <label>Transaction ID</label>
+                <input type="text" id="txnId" value="TXN-8842-LIVE">
+            </div>
+
+            <div class="form-group" style="display: flex; gap: 15px;">
+                <div style="flex: 1;">
+                    <label>Sender ID</label>
+                    <input type="text" id="senderId" value="user_42">
+                </div>
+                <div style="flex: 1;">
+                    <label>Receiver ID</label>
+                    <input type="text" id="receiverId" value="merchant_09">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="txnLocation" value="New York, US">
+            </div>
+
+            <div class="form-group">
+                <label>Device Signature</label>
+                <input type="text" id="txnDevice" value="iPhone 14 Pro [IOS 17.2]">
+            </div>
+        </div>
+
+        <!-- Action -->
+        <div class="action-area">
+            <button class="analyze-btn" onclick="analyzeTransaction()">
+                SECURE SCAN & PAY
+            </button>
+        </div>
+
+        <!-- Result Card -->
+        <div id="resultCard" class="result-card">
+            <div class="status-header">
+                <div>RESULT:</div>
+                <div id="statusBadge" class="status-badge status-safe">SAFE</div>
+            </div>
+
+            <div class="score-display">
+                <span id="riskScore">15.0</span>% <span style="font-size: 1rem; color: #aaa;">RISK</span>
+            </div>
+
+            <div id="narrativeText" class="explanation-text">
+                No anomalies detected. Transaction fits normal patterns.
+            </div>
+        </div>
+
+        <button id="techToggle" class="tech-details-btn" onclick="toggleTechDetails()" style="display: none;">[ VIEW
+            SCORE BREAKDOWN ]</button>
+
+        <div id="techPanel" class="tech-panel"></div>
+
+        <!-- Loader -->
+        <div id="loader" class="loader-overlay">
+            <div class="spinner"></div>
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/phonepe.js') }}"></script>
+</body>
+
+</html>

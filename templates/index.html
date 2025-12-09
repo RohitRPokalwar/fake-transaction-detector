@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake Transaction Detector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <!-- Initial Full Screen Loader -->
+    <div id="initialLoader" class="initial-loader">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-dot red"></div>
+                <div class="terminal-dot yellow"></div>
+                <div class="terminal-dot green"></div>
+                <div class="terminal-title">boot_sequence.sh</div>
+            </div>
+            <div class="terminal-body">
+                <div id="bootText" class="terminal-text"></div>
+                <div class="terminal-cursor">_</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ambient-background">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+    <div class="container">
+        <header>
+            <h1>🔍 Fake Transaction Detector</h1>
+            <p>Hybrid Rule-Based and AIML System for Anomaly Detection</p>
+        </header>
+
+        <div class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-content">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p>Drag & Drop CSV here or <a href="#" class="upload-link">Click to Upload</a></p>
+                    <input type="file" id="fileInput" accept=".csv" hidden>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button id="analyzeBtn" class="btn-primary" disabled>Analyze Transactions</button>
+                <button id="requirementsBtn" class="btn-secondary-outline">CSV Requirements</button>
+                <a href="/live" class="btn-secondary-outline">
+                    🚀 LAUNCH LIVE ANALYZER
+                </a>
+            </div>
+
+            <div id="terminalLoader" class="terminal-loader" style="display: none;">
+                <div class="terminal-loader-window">
+                    <div class="terminal-loader-header">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                        <div class="title">system_process.exe</div>
+                    </div>
+                    <div class="terminal-loader-body">
+                        <div id="terminalLoaderText" class="terminal-loader-text"></div>
+                        <div class="terminal-cursor">_</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="error" class="error" style="display: none;"></div>
+        </div>
+
+        <div id="results" class="results" style="display: none;">
+            <div class="progress-section">
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <p id="progressText">
+                    <span id="streamingIndicator" class="streaming-indicator" style="display: none;"></span>
+                    Analyzing: 0 / 0 transactions
+                </p>
+            </div>
+            <b></b>
+            <div class="summary">
+                <div class="summary-card">
+                    <h3>Total Transactions</h3>
+                    <span id="totalTxns">0</span>
+                </div>
+                <div class="summary-card">
+                    <h3>Anomalous Transactions</h3>
+                    <span id="anomalousTxns">0</span>
+                </div>
+                <div class="summary-card">
+                    <h3>Anomaly Rate</h3>
+                    <span id="anomalyRate">0%</span>
+                </div>
+            </div>
+
+            <div class="filters-section">
+                <div class="filter-controls">
+                    <label>
+                        <input type="checkbox" id="showAnomalousOnly"> Show Anomalous Only
+                    </label>
+                    <input type="text" id="searchInput" placeholder="Search by User ID..." class="search-input">
+                    <select id="sortSelect" class="sort-select">
+                        <option value="">Sort by...</option>
+                        <option value="amount">Amount</option>
+                        <option value="final_score">Score</option>
+                        <option value="status">Status</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="charts">
+                <div class="chart-container">
+                    <canvas id="scoreChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="anomalyChart"></canvas>
+                </div>
+            </div>
+
+            <div class="table-section">
+                <h3>Transaction Details</h3>
+                <div class="action-buttons">
+                    <button id="downloadBtn" class="btn-secondary">Download Anomalies CSV</button>
+                    <button id="downloadReportBtn" class="btn-secondary">📄 Download Intelligence
+                        Briefing</button>
+                </div>
+                <div class="table-container">
+                    <table id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User ID</th>
+                                <th>Amount</th>
+                                <th>Timestamp</th>
+                                <th>Final Score</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for row details -->
+        <div id="detailsModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Transaction Details</h2>
+                <div id="modalBody"></div>
+            </div>
+        </div>
+
+        <!-- Modal for User Profile -->
+        <div id="userProfileModal" class="modal" style="display: none;">
+            <div class="modal-content user-profile-content">
+                <span class="close-profile">&times;</span>
+                <div class="profile-header">
+                    <h2>🕵️ User Dossier</h2>
+                    <div id="userRiskBadge" class="risk-badge"></div>
+                </div>
+                <div id="userProfileBody"></div>
+            </div>
+        </div>
+
+        <!-- CSV Requirements Modal -->
+        <div id="requirementsModal" class="modal" style="display: none;">
+            <div class="terminal-content">
+                <div class="terminal-header">
+                    <div class="terminal-dot red close-requirements"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <div class="terminal-title">requirements.txt</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line">> CAT REQUIREMENTS.TXT</div>
+                    <div class="terminal-line">> REQUIRED_COLUMNS:</div>
+                    <ul class="requirements-list terminal-list">
+                        <li>- transaction_id <span class="comment"># Unique ID</span></li>
+                        <li>- user_id <span class="comment"># User Identifier</span></li>
+                        <li>- amount <span class="comment"># Transaction Value</span></li>
+                        <li>- timestamp <span class="comment"># ISO 8601 Format</span></li>
+                        <li>- location <span class="comment"># Geo Location</span></li>
+                    </ul>
+                    <div class="terminal-line">> NOTE: EXTRA_COLUMNS_IGNORED</div>
+                    <div class="terminal-line blink">_</div>
+                    <div style="text-align: right; margin-top: 20px;">
+                        <button class="btn-terminal close-requirements">CLOSE_SESSION</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terminal Error Modal -->
+        <div id="terminalErrorModal" class="modal" style="display: none;">
+            <div class="terminal-content">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <div class="terminal-title">system_error.log</div>
+                </div>
+                <div class="terminal-body">
+                    <div class="terminal-line">> INITIATING_UPLOAD_SEQUENCE...</div>
+                    <div class="terminal-line error">> FATAL_ERROR: INVALID_CSV_STRUCTURE</div>
+                    <div class="terminal-line">> ANALYZING_HEADERS...</div>
+                    <div id="terminalErrorList" class="terminal-line error"></div>
+                    <div class="terminal-line blink">_</div>
+                    <div style="text-align: right; margin-top: 20px;">
+                        <button id="closeTerminalBtn" class="btn-terminal">ACKNOWLEDGE_ERROR</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Modal Removed: Replaced by Live Analyzer Page -->
+
+        <!-- Fake Bank Alert Overlay (Fixed Position) -->
+        <div id="bankAlert" class="bank-alert" style="display: none;">
+            <div class="bank-alert-header">
+                <span>⚠️ SECURITY ALERT</span>
+                <span style="font-size: 0.8rem;">JUST NOW</span>
+            </div>
+            <div class="bank-alert-body">
+                <div class="bank-icon">🏦</div>
+                <div class="bank-text">
+                    <strong>FAKE Transaction BLOCKED</strong>
+                    <p>Unauthorized transaction detected. Card frozen.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Flash Overlay -->
+        <div id="flashOverlay"
+            style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; opacity: 0; transition: opacity 0.1s; z-index: 1999;">
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}?v=3"></script>
+</body>
+
+</html>

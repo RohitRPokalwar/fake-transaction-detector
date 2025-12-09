@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Documentation // RohitRPokalwar</title>
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            /* Default: Terminal Theme */
+            --bg-color: #000000;
+            --text-color: #00ff00;
+            --dim-color: #008f00;
+            --accent-color: #00ff00;
+            --card-bg: rgba(0, 20, 0, 0.3);
+            --border-color: #008f00;
+            --font-main: 'Courier New', Courier, monospace;
+            --heading-transform: uppercase;
+            --scanline-opacity: 0.25;
+            --shadow-color: rgba(0, 255, 0, 0.1);
+        }
+
+        body.theme-cyberpunk {
+            --bg-color: #050510;
+            --text-color: #00f0ff;
+            /* Cyan Text */
+            --dim-color: #b000ff;
+            /* Purple Dim */
+            --accent-color: #fcee0a;
+            /* Neon Yellow Accent */
+            --card-bg: rgba(5, 5, 16, 0.8);
+            --border-color: #fcee0a;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --heading-transform: uppercase;
+            --scanline-opacity: 0.1;
+            --shadow-color: rgba(0, 240, 255, 0.3);
+        }
+
+        /* --- GLOBAL STYLES --- */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Scanline effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 999;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            opacity: var(--scanline-opacity);
+        }
+
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--dim-color);
+            transition: all 0.2s;
+        }
+
+        a:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            text-decoration: none;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            box-shadow: 0 0 20px var(--shadow-color);
+            position: relative;
+        }
+
+        /* --- HEADER & NAV --- */
+        header {
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            text-transform: var(--heading-transform);
+            letter-spacing: 2px;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--shadow-color);
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--dim-color);
+            margin-top: 10px;
+        }
+
+        .user-tag {
+            margin-top: 10px;
+            font-weight: bold;
+            border: 1px solid var(--accent-color);
+            display: inline-block;
+            padding: 5px 15px;
+            color: var(--text-color);
+        }
+
+        /* Theme Switcher Button */
+        .theme-switch {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: var(--font-main);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .theme-switch:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        nav {
+            margin-bottom: 30px;
+            border: 1px solid var(--dim-color);
+            padding: 10px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        nav li::before {
+            content: ">";
+            margin-right: 5px;
+            color: var(--dim-color);
+        }
+
+        /* --- SECTIONS & CARDS --- */
+        section {
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            border-bottom: 1px solid var(--dim-color);
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            color: var(--accent-color);
+        }
+
+        h2::before {
+            content: "./";
+            margin-right: 5px;
+            opacity: 0.7;
+        }
+
+        h3 {
+            color: var(--text-color);
+            margin-top: 25px;
+            opacity: 0.9;
+        }
+
+        h3::before {
+            content: ">> ";
+            color: var(--dim-color);
+        }
+
+        .card {
+            border: 1px solid var(--dim-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: var(--card-bg);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px var(--shadow-color);
+        }
+
+        /* --- TABLES & CODE --- */
+        code,
+        pre {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--dim-color);
+            color: var(--accent-color);
+        }
+
+        code {
+            padding: 2px 5px;
+        }
+
+        pre {
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            border: 1px solid var(--dim-color);
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid var(--dim-color);
+            border-right: 1px solid var(--dim-color);
+        }
+
+        th {
+            background-color: rgba(255, 255, 255, 0.05);
+            text-transform: uppercase;
+            color: var(--accent-color);
+        }
+
+        .badge {
+            border: 1px solid var(--accent-color);
+            padding: 2px 6px;
+            font-size: 0.8em;
+            margin-right: 5px;
+            text-transform: uppercase;
+            color: var(--accent-color);
+        }
+
+        /* --- FLOW CHART --- */
+        .architecture-flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            font-size: 0.9rem;
+            margin: 20px 0;
+        }
+
+        .flow-step {
+            border: 1px solid var(--accent-color);
+            padding: 5px 10px;
+            background: var(--card-bg);
+            color: var(--accent-color);
+        }
+
+        .arrow {
+            color: var(--dim-color);
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- MOBILE RESPONSIVE --- */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 10px;
+                border: none;
+                /* Simplify on mobile */
+                box-shadow: none;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .theme-switch {
+                position: static;
+                display: block;
+                margin: 10px auto;
+                width: fit-content;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            nav li {
+                width: 100%;
+                border-bottom: 1px dotted var(--dim-color);
+                padding-bottom: 5px;
+            }
+
+            .architecture-flow {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .arrow {
+                transform: rotate(90deg);
+                /* Point down */
+                margin: 5px 0;
+            }
+
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            tr {
+                border: 1px solid var(--dim-color);
+                margin-bottom: 10px;
+            }
+
+            td {
+                border: none;
+                border-bottom: 1px solid var(--dim-color);
+                position: relative;
+                padding-left: 50%;
+            }
+
+            td:before {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                content: attr(data-label);
+                font-weight: bold;
+                color: var(--dim-color);
+            }
+        }
+
+        /* --- LOGIN MODAL --- */
+        #login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--font-main);
+        }
+
+        .login-terminal {
+            width: 90%;
+            max-width: 500px;
+            border: 2px solid var(--accent-color);
+            padding: 2px;
+            background-color: var(--bg-color);
+            box-shadow: 0 0 30px var(--shadow-color);
+        }
+
+        .term-header {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            padding: 5px 10px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .term-body {
+            padding: 30px;
+            text-align: center;
+        }
+
+        #password-input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            font-family: inherit;
+            font-size: 1.2rem;
+            width: 80%;
+            outline: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #submit-pass {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            text-transform: uppercase;
+            width: 100%;
+        }
+
+        .error-msg {
+            color: #ff0000;
+            margin-top: 15px;
+            display: none;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            border-top: 1px solid var(--dim-color);
+            padding-top: 20px;
+            color: var(--dim-color);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Login Modal -->
+    <div id="login-modal">
+        <div class="login-terminal">
+            <div class="term-header">System Access Control</div>
+            <div class="term-body">
+                <p>SECURE UPLINK ESTABLISHED</p>
+                <p>IDENTITY VERIFICATION REQUIRED</p>
+                <input type="password" id="password-input" placeholder="ENTER PASSCODE" autofocus autocomplete="off">
+                <button id="submit-pass">[ AUTHENTICATE ]</button>
+                <div id="error-msg" class="error-msg">>> ACCESS DENIED.</div>
+                <div id="hint-msg" class="hint-msg" style="margin-top:15px; color:var(--dim-color);"><span
+                        id="password-hint"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <button class="theme-switch" id="theme-toggle" onclick="toggleTheme()">[ SWITCH THEME ]</button>
+            <h1>Fake Transaction Detector</h1>
+            <div class="subtitle">v2.0.4 [STABLE] // SYSTEM READY</div>
+            <div class="user-tag">USER: RohitRPokalwar</div>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="#overview">/sys/overview</a></li>
+                <li><a href="#architecture">/sys/architecture</a></li>
+                <li><a href="#algorithms">/bin/algorithms</a></li>
+                <li><a href="#liveanalyzer">/bin/live_analyzer</a></li>
+                <li><a href="#implementation">/src/implementation</a></li>
+                <li><a href="#scoring">/bin/scoring</a></li>
+                <li><a href="#api">/net/api_ref</a></li>
+            </ul>
+        </nav>
+
+        <!-- Overview Section -->
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>The <strong>Fake Transaction Detector</strong> is a high-performance system designed to identify
+                fraudulent, incorrect, or abnormal transaction records. It employs a multi-layered approach combining
+                deterministic rules, statistical analysis, unsupervised machine learning, and graph theory.</p>
+
+            <div class="card">
+                <h3>>> System Capabilities</h3>
+                <ul>
+                    <li>[+] <strong>Multi-Modal Detection:</strong> Rules (DDIE) + Stats (SSG) + ML (UAIC) + Graph
+                        Analysis.</li>
+                    <li>[+] <strong>Explainable AI:</strong> SHAP/LIME integration for anomaly explanation.</li>
+                    <li>[+] <strong>Auto-Tuning:</strong> Dynamic threshold adjustment based on data distribution.</li>
+                    <li>[+] <strong>Interactive Dashboard:</strong> Real-time visualization and reporting.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Architecture Section -->
+        <section id="architecture">
+            <h2>System Architecture</h2>
+            <p>Data pipeline execution flow:</p>
+
+            <div class="architecture-flow">
+                <div class="flow-step">[CSV_UPLOAD]</div>
+                <div class="arrow">>></div>
+                <div class="flow-step">[PREPROCESSING]</div>
+                <div class="arrow">>></div>
+                <div class="flow-step">[DDIE_RULES]</div>
+                <div class="arrow">>></div>
+                <div class="flow-step">[SSG_STATS]</div>
+                <div class="arrow">>></div>
+                <div class="flow-step">[UAIC_ML]</div>
+                <div class="arrow">>></div>
+                <div class="flow-step">[GRAPH_ANALYSIS]</div>
+                <div class="arrow">>></div>
+                <div class="flow-step">[HYBRID_SCORING]</div>
+                <div class="arrow">>></div>
+                <div class="flow-step">[DASHBOARD]</div>
+            </div>
+
+            <div class="card">
+                <h3>>> Tech Stack</h3>
+                <ul>
+                    <li><strong>Backend:</strong> Python, Flask</li>
+                    <li><strong>Data Processing:</strong> Pandas, NumPy</li>
+                    <li><strong>ML Core:</strong> Scikit-learn (Isolation Forest), SHAP, LIME</li>
+                    <li><strong>Graph Core:</strong> NetworkX, Louvain Community Detection</li>
+                    <li><strong>Frontend:</strong> HTML5, CSS3 (Multi-Theme), Vanilla JS</li>
+                    <li><strong>Report Generation:</strong> FPDF (PDF Intelligence Reports)</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Implementation Section -->
+        <section id="implementation">
+            <h2>Implementation Details</h2>
+            <p>Key files and their responsibilities in the system architecture.</p>
+
+            <div class="card">
+                <h3>>> Core Backend</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>FILE</th>
+                            <th>PURPOSE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-label="FILE"><code>app.py</code></td>
+                            <td data-label="PURPOSE">Flask application, API endpoints, streaming analysis</td>
+                        </tr>
+                        <tr>
+                            <td data-label="FILE"><code>utils/preprocess.py</code></td>
+                            <td data-label="PURPOSE">Data cleaning and validation</td>
+                        </tr>
+                        <tr>
+                            <td data-label="FILE"><code>utils/ddie.py</code></td>
+                            <td data-label="PURPOSE">Deterministic rule engine</td>
+                        </tr>
+                        <tr>
+                            <td data-label="FILE"><code>utils/uaic.py</code></td>
+                            <td data-label="PURPOSE">ML anomaly detection (Isolation Forest)</td>
+                        </tr>
+                        <tr>
+                            <td data-label="FILE"><code>utils/graph_anomaly.py</code></td>
+                            <td data-label="PURPOSE">Graph-based anomaly detection with specific reasons</td>
+                        </tr>
+                        <tr>
+                            <td data-label="FILE"><code>utils/scoring.py</code></td>
+                            <td data-label="PURPOSE">Hybrid scoring with configurable weights</td>
+                        </tr>
+                        <tr>
+                            <td data-label="FILE"><code>utils/explain.py</code></td>
+                            <td data-label="PURPOSE">XAI explanations using SHAP/LIME</td>
+                        </tr>
+                        <tr>
+                            <td data-label="FILE"><code>utils/report_generator.py</code></td>
+                            <td data-label="PURPOSE">PDF intelligence report generation</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>>> Frontend Components</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>FILE</th>
+                            <th>PURPOSE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-label="FILE"><code>templates/index.html</code></td>
+                            <td data-label="PURPOSE">Main dashboard (Dark Fintech theme)</td>
+                        </tr>
+                        <tr>
+                            <td data-label="FILE"><code>templates/phonepe.html</code></td>
+                            <td data-label="PURPOSE">Live Analyzer interface (Cyber-Payment theme)</td>
+                        </tr>
+                        <tr>
+                            <td data-label="FILE"><code>static/css/style.css</code></td>
+                            <td data-label="PURPOSE">Main dashboard styling</td>
+                        </tr>
+                        <tr>
+                            <td data-label="FILE"><code>static/css/phonepe.css</code></td>
+                            <td data-label="PURPOSE">Live Analyzer purple/neon aesthetic</td>
+                        </tr>
+                        <tr>
+                            <td data-label="FILE"><code>static/js/app.js</code></td>
+                            <td data-label="PURPOSE">Dashboard logic, streaming results, charts</td>
+                        </tr>
+                        <tr>
+                            <td data-label="FILE"><code>static/js/phonepe.js</code></td>
+                            <td data-label="PURPOSE">Live Analyzer interaction and animations</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Algorithms Section -->
+        <section id="algorithms">
+            <h2>Core Algorithms</h2>
+
+            <div class="card">
+                <h3><span class="badge">DDIE</span> Deterministic Data Integrity Engine</h3>
+                <p><strong>Source:</strong> <code>utils/ddie.py</code></p>
+                <p>Strict validation against known fraud patterns.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>RULE_ID</th>
+                            <th>DESCRIPTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-label="RULE_ID">DUP_DETECT</td>
+                            <td data-label="DESCRIPTION">Identifies transactions with identical IDs.</td>
+                        </tr>
+                        <tr>
+                            <td data-label="RULE_ID">TIME_VIOLATION</td>
+                            <td data-label="DESCRIPTION">Flags future dates or invalid formats.</td>
+                        </tr>
+                        <tr>
+                            <td data-label="RULE_ID">AMT_ANOMALY</td>
+                            <td data-label="DESCRIPTION">Detects negative, zero, or extreme values (>10,000).</td>
+                        </tr>
+                        <tr>
+                            <td data-label="RULE_ID">MISSING_FIELD</td>
+                            <td data-label="DESCRIPTION">Ensures all mandatory columns are present.</td>
+                        </tr>
+                        <tr>
+                            <td data-label="RULE_ID">TIME_GAP</td>
+                            <td data-label="DESCRIPTION">Flags unrealistic frequency (< 5s gap).</td>
+                        </tr>
+                        <tr>
+                            <td data-label="RULE_ID">LOC_CONFLICT</td>
+                            <td data-label="DESCRIPTION">Detects impossible travel (diff loc < 5 mins).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3><span class="badge">UAIC</span> Unsupervised Anomaly Isolation Core</h3>
+                <p><strong>Source:</strong> <code>utils/uaic.py</code></p>
+                <p>Uses <strong>Isolation Forest</strong> for outlier detection.</p>
+                <p><strong>Feature Vectors:</strong></p>
+                <ul>
+                    <li>Amount (Raw Value)</li>
+                    <li>Cyclical Time (Sin/Cos of Hour/Day)</li>
+                    <li>User Frequency (Count per user)</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3><span class="badge">GRAPH</span> Graph Anomaly Detector</h3>
+                <p><strong>Source:</strong> <code>utils/graph_anomaly.py</code></p>
+                <p>Graph Model: <strong>Nodes=Accounts</strong>, <strong>Edges=Transactions</strong>.</p>
+                <ul>
+                    <li><strong>Centrality:</strong> Degree, Betweenness, Eigenvector.</li>
+                    <li><strong>Community:</strong> Louvain method. Cross-community penalty.</li>
+                    <li><strong>Weights:</strong> Historical edge weight comparison.</li>
+                </ul>
+                <p><strong>Enhanced Output:</strong> Returns specific anomaly reasons:</p>
+                <ul>
+                    <li>"Cross-Community Transaction" - Unusual group interaction</li>
+                    <li>"Interaction between isolated/low-activity accounts"</li>
+                    <li>"Unusually high value for this connection history"</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3><span class="badge">SSG</span> Statistical Signature Generator</h3>
+                <p><strong>Source:</strong> <code>utils/ssg.py</code></p>
+                <p>Baseline statistics computation.</p>
+                <ul>
+                    <li><strong>Metrics:</strong> Mean, Median, Std Dev, MAD, IQR, Min/Max.</li>
+                    <li><strong>Velocity:</strong> Txn/Hour.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Live Analyzer Section -->
+        <section id="liveanalyzer">
+            <h2>Live Analyzer (PhonePe Style)</h2>
+            <p>A modernized, standalone interactive interface replacing the legacy Judge Mode.</p>
+
+            <div class="card">
+                <h3>>> UX & Design</h3>
+                <ul>
+                    <li><strong>Aesthetic:</strong> "Cyber-Payment" Theme (Deep Purple & Neon Green).</li>
+                    <li><strong>Layout:</strong> Centralized transaction card mimicking real-world payment apps.</li>
+                    <li><strong>Interactivity:</strong>
+                        <ul>
+                            <li>Live editing of Transaction ID, Amount, User ID.</li>
+                            <li>Instant "SCANNING..." animations.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>>> XAI & Transparency</h3>
+                <p>The system provides a "Glass Box" view into decision making:</p>
+                <ul>
+                    <li><strong>Internal Logic:</strong> Displays raw scores from all engines (Rule/ML/Graph).</li>
+                    <li><strong>Weight Visualization:</strong> Shows exactly how the Final Risk Score was calculated.
+                    </li>
+                    <li><strong>Normal Pattern Analysis:</strong> Compares current transaction values against global
+                        averages.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Scoring Section -->
+        <section id="scoring">
+            <h2>Hybrid Scoring System</h2>
+            <p><strong>Source:</strong> <code>utils/scoring.py</code></p>
+
+            <div class="card">
+                <h3>>> Calculation Formula</h3>
+                <pre><code>SCORE = (0.4 * RULE) + (0.5 * ML) + (0.1 * GRAPH)</code></pre>
+                <p><em>* Weights are configurable via config.json</em></p>
+            </div>
+
+            <div class="card">
+                <h3>>> Auto-Tuning Logic</h3>
+                <ul>
+                    <li><strong>Supervised:</strong> ROC Curve Analysis (TPR vs FPR).</li>
+                    <li><strong>Unsupervised:</strong> 95th Percentile Threshold.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- API Section -->
+        <section id="api">
+            <h2>API Reference</h2>
+            <p><strong>Source:</strong> <code>app.py</code></p>
+
+            <div class="card">
+                <h3>>> Endpoints</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>METHOD</th>
+                            <th>ENDPOINT</th>
+                            <th>DESCRIPTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-label="METHOD">POST</td>
+                            <td data-label="ENDPOINT"><code>/api/upload</code></td>
+                            <td data-label="DESCRIPTION">Upload CSV. Returns <code>file_id</code>.</td>
+                        </tr>
+                        <tr>
+                            <td data-label="METHOD">GET</td>
+                            <td data-label="ENDPOINT"><code>/api/analyze/&lt;id&gt;</code></td>
+                            <td data-label="DESCRIPTION">Stream analysis (SSE).</td>
+                        </tr>
+                        <tr>
+                            <td data-label="METHOD">GET</td>
+                            <td data-label="ENDPOINT"><code>/api/user_profile/&lt;id&gt;/&lt;uid&gt;</code></td>
+                            <td data-label="DESCRIPTION">Get user stats.</td>
+                        </tr>
+                        <tr>
+                            <td data-label="METHOD">GET</td>
+                            <td data-label="ENDPOINT"><code>/api/generate_report/&lt;id&gt;</code></td>
+                            <td data-label="DESCRIPTION">Generate PDF report.</td>
+                        </tr>
+                        <tr>
+                            <td data-label="METHOD">POST</td>
+                            <td data-label="ENDPOINT"><code>/api/judge</code></td>
+                            <td data-label="DESCRIPTION">Evaluate single transaction with transparency data
+                                (rule/ml/graph scores, weights).</td>
+                        </tr>
+                        <tr>
+                            <td data-label="METHOD">GET</td>
+                            <td data-label="ENDPOINT"><code>/live</code></td>
+                            <td data-label="DESCRIPTION">Serve Live Analyzer interface (PhonePe-style UI).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>>> /api/judge Response Format</h3>
+                <pre><code>{
+  "transaction_id": "TXN_123",
+  "user_id": "user_001",
+  "final_score": 0.753,
+  "is_anomalous": true,
+  "explanation": "&lt;HTML formatted XAI explanation&gt;",
+  "details": {
+    "rule_score": 0.8,
+    "ml_score": 0.65,
+    "graph_score": 0.3,
+    "weights": {
+      "rule": 0.4,
+      "ml": 0.5,
+      "graph": 0.1
+    },
+    "threshold": 0.6
+  }
+}</code></pre>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2025 Fake Transaction Detector | RohitRPokalwar | SYSTEM_ACTIVE</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- THEME LOGIC ---
+        function toggleTheme() {
+            const body = document.body;
+            if (body.classList.contains('theme-cyberpunk')) {
+                body.classList.remove('theme-cyberpunk');
+                localStorage.setItem('doc_theme', 'terminal');
+            } else {
+                body.classList.add('theme-cyberpunk');
+                localStorage.setItem('doc_theme', 'cyberpunk');
+            }
+        }
+
+        // Apply saved theme on load
+        const savedTheme = localStorage.getItem('doc_theme');
+        if (savedTheme === 'cyberpunk') {
+            document.body.classList.add('theme-cyberpunk');
+        }
+
+        // --- PASSWORD LOGIC ---
+        document.addEventListener('DOMContentLoaded', function () {
+            const hasLoggedIn = localStorage.getItem('doc_logged_in_before');
+            const modal = document.getElementById('login-modal');
+            const passwordInput = document.getElementById('password-input');
+            const submitBtn = document.getElementById('submit-pass');
+            const errorMsg = document.getElementById('error-msg');
+            const hint = document.getElementById('password-hint');
+
+            // Set initial focus
+            passwordInput.focus();
+
+            // Determine required password
+            let requiredPass = 'Rohit';
+            if (hasLoggedIn) {
+                requiredPass = '8600';
+                hint.textContent = "HINT: ACCESS_CODE CHANGED TO SECURE PIN.";
+            } else {
+                hint.textContent = "HINT: FIRST TIME ACCESS INITIALIZATION.";
+            }
+
+            function checkPassword() {
+                if (passwordInput.value === requiredPass) {
+                    // Success effect
+                    const termBody = document.querySelector('.term-body');
+                    termBody.innerHTML = '<p style="color: var(--accent-color);">>> ACCESS GRANTED.</p><p>LOADING SYSTEM RESOURCES...</p>';
+
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        document.body.style.overflow = 'auto'; // Restore scrolling
+                    }, 1000);
+
+                    // If this was the first time, set the flag for next time
+                    if (!hasLoggedIn) {
+                        localStorage.setItem('doc_logged_in_before', 'true');
+                        setTimeout(() => {
+                            alert("SYSTEM MESSAGE: Next login password updated to: 8600");
+                        }, 1200);
+                    }
+                } else {
+                    errorMsg.style.display = 'block';
+                    passwordInput.value = '';
+                }
+            }
+
+            submitBtn.addEventListener('click', checkPassword);
+
+            passwordInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    checkPassword();
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
