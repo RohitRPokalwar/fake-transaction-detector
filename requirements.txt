@@ -9,4 +9,4 @@ networkx
 matplotlib
 python-louvain
 fpdf
-fpdf
+bs4
