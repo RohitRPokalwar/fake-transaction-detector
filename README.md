@@ -19,6 +19,7 @@ A hybrid rule-based and AI/ML system for automatically identifying fake, incorre
 ```
 CSV Upload → Preprocessing → DDIE Rules → SSG Stats → UAIC ML → Hybrid Scoring → Explanations → Dashboard
 ```
+![Architecture Final](https://github.com/user-attachments/assets/84bc50d0-5b44-4460-afc9-6163209f2a15)
 
 ## Installation
 
