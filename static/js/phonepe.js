@@ -17,8 +17,7 @@ async function analyzeTransaction() {
         receiver_id: document.getElementById('receiverId').value,
         amount: parseFloat(document.getElementById('txnAmount').value),
         location: document.getElementById('txnLocation').value,
-        device_id: document.getElementById('txnDevice').value,
-        timestamp: new Date().toISOString()
+        timestamp: document.getElementById('txnTimestamp').value || new Date().toISOString().replace('T', ' ').substring(0, 19)
     };
 
     try {
@@ -34,6 +33,10 @@ async function analyzeTransaction() {
 
         // Update UI
         updateResult(data);
+
+        // Auto-generate NEW ID for next scan (prevents "Duplicate" error on Burst test)
+        document.getElementById('txnId').value = "TXN-" + Math.floor(Math.random() * 900000 + 100000) + "-LIVE";
+
 
     } catch (e) {
         alert("Analysis Failed: " + e.message);
@@ -97,6 +100,7 @@ THRESHOLD:         ${(d.threshold * 100).toFixed(1)}%
     }
 }
 
+
 function toggleTechDetails() {
     const p = document.getElementById('techPanel');
     if (p.style.display === 'none') {
@@ -105,3 +109,26 @@ function toggleTechDetails() {
         p.style.display = 'none';
     }
 }
+
+// Auto-fill timestamp on load
+// Auto-fill timestamp on load AND Reset Context
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Auto-fill Time (Live Clock)
+    const tsInput = document.getElementById('txnTimestamp');
+    if (tsInput) {
+        const updateTime = () => {
+            // Only update if user is NOT typing (not focused)
+            if (document.activeElement !== tsInput) {
+                const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
+                tsInput.value = now;
+            }
+        };
+        updateTime(); // Initial
+        setInterval(updateTime, 1000); // Live Update
+    }
+
+    // 2. Reset Backend Context
+    fetch('/api/reset_judge', { method: 'POST' })
+        .then(res => console.log("Judge Context Reset"))
+        .catch(err => console.error("Reset Failed", err));
+});

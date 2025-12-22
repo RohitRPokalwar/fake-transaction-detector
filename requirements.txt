@@ -10,3 +10,4 @@ matplotlib
 python-louvain
 fpdf
 bs4
+gunicorn

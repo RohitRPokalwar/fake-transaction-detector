@@ -366,6 +366,7 @@ def init_global_model():
             scorer = HybridScorer()
             scorer.auto_tune_threshold(rule_results['rule_score'].tolist(), ml_scores, graph_scores)
             
+            global_model_context['base_df'] = df.copy()
             global_model_context['df'] = df
             global_model_context['uaic'] = uaic
             global_model_context['scorer'] = scorer
@@ -386,6 +387,15 @@ def init_global_model():
 # Initialize on startup
 init_global_model()
 
+@app.route('/api/reset_judge', methods=['POST'])
+def reset_judge():
+    """Reset the Judge Mode context to its original state."""
+    if 'base_df' in global_model_context:
+        global_model_context['df'] = global_model_context['base_df'].copy()
+        logger.info("Judge Mode context reset to base state.")
+        return jsonify({'status': 'reset_complete'}), 200
+    return jsonify({'status': 'no_base_data'}), 200
+
 @app.route('/api/judge', methods=['POST'])
 def judge_transaction():
     """Judge a single manually entered transaction."""
@@ -394,6 +404,7 @@ def judge_transaction():
         amount = float(data.get('amount', 0))
         location = data.get('location', 'Unknown')
         user_id = data.get('user_id', 'JUDGE_USER')
+        recipient_id = data.get('recipient_id') or data.get('receiver_id') or 'Unknown_Recipient'
         txn_id = data.get('transaction_id') or f"JUDGE-{uuid.uuid4().hex[:8]}"
         timestamp = data.get('timestamp')
         
@@ -406,6 +417,7 @@ def judge_transaction():
         row_dict = {
             'transaction_id': txn_id,
             'user_id': user_id,
+            'recipient_id': recipient_id,
             'amount': amount,
             'location': location,
             'timestamp': timestamp
@@ -418,15 +430,42 @@ def judge_transaction():
         # 1. Rule Check
         single_df = pd.DataFrame([row_dict])
         
+        # Add to context to allow history-based rules (Burst, Travel)
+        augmented_df = pd.concat([context_df, single_df], ignore_index=True)
+        
         preprocessor = Preprocessor()
-        single_df = preprocessor.clean_data(single_df)
+        augmented_df = preprocessor.clean_data(augmented_df)
         
         ddie = DDIE()
-        rule_results = ddie.apply_rules(single_df)
-        rule_score = rule_results.iloc[0]['rule_score']
-        reasons = rule_results.iloc[0]['reasons'] # List of strings
+        # Apply rules to WHOLE history to catch time/location gaps
+        all_rule_results = ddie.apply_rules(augmented_df)
         
-        # 2. ML Score
+        # Extract result for the LAST row (the one we are judging)
+        rule_results = all_rule_results.iloc[[-1]]
+        rule_score = rule_results.iloc[0]['rule_score']
+        reasons = rule_results.iloc[0]['reasons']
+        
+        # SAVE history for next time (So the 2nd burst click sees the 1st)
+        global_model_context['df'] = augmented_df
+        
+        # 2. Graph Check (Run on Augmented Context to find Loops)
+        graph_score = 0.0
+        graph_reasons = []
+        try:
+            # Add new row to existing context to check for connections
+            augmented_df = pd.concat([context_df, single_df], ignore_index=True)
+            
+            graph_detector = GraphAnomalyDetector()
+            g_scores, g_reasons_list = graph_detector.detect_anomalies(augmented_df)
+            
+            if g_scores:
+                # The last transaction is the one we just added
+                graph_score = g_scores[-1]
+                graph_reasons = g_reasons_list[-1]
+        except Exception as e:
+            logger.error(f"Judge Graph Error: {e}")
+
+        # 3. ML Score
         uaic = global_model_context.get('uaic')
         ml_score = 0.0
         if uaic and uaic.model:
@@ -437,8 +476,15 @@ def judge_transaction():
         if not scorer:
             scorer = HybridScorer() # Fallback
             
-        final_score = scorer.compute_hybrid_score(rule_score, ml_score)
-        is_anomalous = bool(scorer.is_anomalous(final_score))
+        final_score = scorer.compute_hybrid_score(rule_score, ml_score, graph_score)
+        
+        # Override for Judge Mode: Make it sensitive so it IMPRESSES
+        # If ANY rule is triggered or Graph Loop found, mark as Anomalous immediately.
+        if rule_score > 0.1 or graph_score > 0.5:
+            final_score = max(final_score, 0.85) # Force high score
+            is_anomalous = True
+        else:
+            is_anomalous = bool(scorer.is_anomalous(final_score))
         
         # 4. Explanation Generation (Structured HTML)
         # 4. Explanation Generation

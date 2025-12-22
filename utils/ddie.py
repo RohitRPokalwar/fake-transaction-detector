@@ -53,7 +53,7 @@ class DDIE:
             # If this is not the first occurrence
             if len(duplicates) > 1 and row.name > duplicates.index[0]:
                  original_idx = duplicates.index[0]
-                 return 0.9, f"Duplicate: Replay of Transaction at Row {original_idx + 1}"
+                 return 0.9, "Duplicate: Replay of Previous Transaction"
                  
         return 0.0, None
 

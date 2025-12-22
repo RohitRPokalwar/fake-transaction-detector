@@ -6,7 +6,7 @@
 ---
 
 ## 🌟 Overview
-**Fake Transaction Detector** is a financial intelligence tool capable of identifying fraudulent patterns in real-time. Unlike traditional systems that rely solely on static rules or "black-box" AI, FTD uses a **Triple-Engine Architecture**:
+**Fake Transaction Detector** is a financial intelligence tool capable of identifying fraudulent patterns in real-time. Unlike traditional systems that FTD uses a **Triple-Engine Architecture**:
 1.  **Deterministic Rules (DDIE):** Catch obvious violations instantly (Burst, Future Date, Negative Amount).
 2.  **Graph Network Analysis:** Uncover hidden Money Laundering rings and Loops.
 3.  **Unsupervised ML (UAIC):** Detect subtle behavioral anomalies (Isolation Forest).

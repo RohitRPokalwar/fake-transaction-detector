@@ -164,8 +164,8 @@ class GraphAnomalyDetector:
                 limit = 0
                 for cycle in cycles:
                     limit += 1
-                    if limit > 2000: break # Safety break
-                    
+                    if limit > 10000: break # Increased limit
+
                     if 2 <= len(cycle) <= 6: # Filter for tight laundering loops
                         # Check amounts consistency to ensure it's a "Money Pass-Through"
                         cycle_amounts = []
@@ -181,11 +181,11 @@ class GraphAnomalyDetector:
                         min_amt = min(cycle_amounts)
                         max_amt = max(cycle_amounts)
                         
-                        # If amounts are roughly consistent (min is at least 80% of max)
+                        # If amounts are roughly consistent (min is at least 50% of max)
                         # This catches 50k -> 49k -> 48k (ratio ~0.96)
                         # But ignores 40k -> 100 -> 40k (ratio ~0.002) - i.e. buying coffee inside a loop
                         
-                        if min_amt > 0 and (min_amt / max_amt) > 0.8:
+                        if min_amt > 0 and (min_amt / max_amt) > 0.5:
                             # Create descriptive string: A -> B -> C -> A
                             avg_amt = sum(cycle_amounts) / len(cycle_amounts)
                             cycle_str = " -> ".join(str(n) for n in cycle) + " -> " + str(cycle[0])
