@@ -105,6 +105,14 @@
                     <h3>Anomaly Rate</h3>
                     <span id="anomalyRate">0%</span>
                 </div>
+                <div class="summary-card">
+                    <h3>Average Amount</h3>
+                    <span id="avgAmount">₹0</span>
+                </div>
+                <div class="summary-card">
+                    <h3>Most Active User</h3>
+                    <span id="activeUser">N/A</span>
+                </div>
             </div>
 
             <div class="filters-section">
@@ -192,6 +200,7 @@
                     <ul class="requirements-list terminal-list">
                         <li>- transaction_id <span class="comment"># Unique ID</span></li>
                         <li>- user_id <span class="comment"># User Identifier</span></li>
+                        <li>- recipient_id <span class="comment"># Recipient Identifier</span></li>
                         <li>- amount <span class="comment"># Transaction Value</span></li>
                         <li>- timestamp <span class="comment"># ISO 8601 Format</span></li>
                         <li>- location <span class="comment"># Geo Location</span></li>

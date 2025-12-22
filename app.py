@@ -135,6 +135,11 @@ def index():
 def live_analyzer():
     return render_template('phonepe.html')
 
+@app.route('/architecture')
+def architecture():
+    """Serve the system architecture visualization."""
+    return render_template('architecture.html')
+
 @app.route('/api/analyze/<file_id>', methods=['GET'])
 def analyze(file_id):
     """Analyze uploaded CSV for fake transactions in streaming mode."""
@@ -228,8 +233,11 @@ def analyze(file_id):
                 else:
                     ml_score = 0.0
 
+                # Get Graph score
+                graph_score = graph_scores[i] if i < len(graph_scores) else 0.0
+
                 # Compute hybrid score
-                final_score = scorer.compute_hybrid_score(rule_score, ml_score)
+                final_score = scorer.compute_hybrid_score(rule_score, ml_score, graph_score)
                 is_anomalous = bool(scorer.is_anomalous(final_score))
 
                 # Generate explanation with SHAP/LIME if available
@@ -329,9 +337,9 @@ global_model_context = {}
 def init_global_model():
     """Initialize a global model using sample data for immediate judging."""
     try:
-        sample_path = 'sample_transactions.csv'
+        sample_path = 'new_sample_transactions.csv'
         if not os.path.exists(sample_path):
-            sample_path = os.path.join('sample_data', 'sample_transactions.csv')
+            sample_path = os.path.join('sample_data', 'new_sample_transactions.csv')
             
         if os.path.exists(sample_path):
             logger.info("Initializing global model from sample data...")

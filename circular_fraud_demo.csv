@@ -1,0 +1,6 @@
+transaction_id,user_id,recipient_id,amount,timestamp,location
+TXN-101,User_A,User_B,50000,2025-01-01 10:00:00,Mumbai
+TXN-102,User_B,User_C,48000,2025-01-01 10:15:00,Delhi
+TXN-103,User_C,User_A,46000,2025-01-01 10:30:00,Bangalore
+TXN-104,User_D,User_E,1200,2025-01-01 10:05:00,Pune
+TXN-105,User_E,User_F,500,2025-01-01 11:00:00,Chennai

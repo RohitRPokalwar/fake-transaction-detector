@@ -16,6 +16,7 @@ class GraphAnomalyDetector:
         self.centrality_scores = {}
         self.edge_weights = {}
         self.communities = {}
+        self.edge_to_cycle_map = {}
 
     def _build_graph(self, df):
         """
@@ -26,8 +27,23 @@ class GraphAnomalyDetector:
         self.graph = nx.DiGraph()
 
         # Identify columns (assume 'sender', 'receiver', 'amount' or fallback to first three columns)
-        sender_col = 'sender' if 'sender' in df.columns else df.columns[0]
-        receiver_col = 'receiver' if 'receiver' in df.columns else df.columns[1]
+        # Identify columns (Smart detection)
+        possible_senders = ['sender', 'source', 'user_id', 'origin_account']
+        possible_receivers = ['receiver', 'recipient', 'target', 'recipient_id', 'destination_account']
+        
+        sender_col = next((c for c in possible_senders if c in df.columns), df.columns[0])
+        # If receiver column not found, try to find a column that isn't sender, amount, tx_id, time
+        receiver_col = next((c for c in possible_receivers if c in df.columns), None)
+        
+        if receiver_col is None:
+             # Fallback: using column 1 if it's not sender, else column 2
+             if len(df.columns) > 1 and df.columns[1] != sender_col:
+                 receiver_col = df.columns[1]
+             elif len(df.columns) > 2:
+                 receiver_col = df.columns[2]
+             else:
+                 receiver_col = df.columns[-1] # Desperate fallback
+
         amount_col = 'amount' if 'amount' in df.columns else (df.columns[2] if len(df.columns) > 2 else None)
 
         # Add nodes
@@ -35,8 +51,9 @@ class GraphAnomalyDetector:
         self.graph.add_nodes_from(all_accounts)
 
         # Add edges with weights
+        # Add edges with weights
         edge_counts = defaultdict(int)
-        edge_amounts = defaultdict(float)
+        self.edge_amounts = defaultdict(float)
 
         for _, row in df.iterrows():
             sender = row[sender_col]
@@ -45,10 +62,10 @@ class GraphAnomalyDetector:
 
             if pd.notna(sender) and pd.notna(receiver):
                 edge_counts[(sender, receiver)] += 1
-                edge_amounts[(sender, receiver)] += amount
+                self.edge_amounts[(sender, receiver)] += amount
 
         for (sender, receiver), count in edge_counts.items():
-            total_amount = edge_amounts[(sender, receiver)]
+            total_amount = self.edge_amounts[(sender, receiver)]
             # Weight combines frequency and total amount (normalized)
             weight = count * np.log1p(abs(total_amount))
             self.graph.add_edge(sender, receiver, weight=weight)
@@ -97,16 +114,8 @@ class GraphAnomalyDetector:
         score = 0.0
         reasons = []
 
-        # Centrality-based anomaly: transactions between low-centrality nodes are more suspicious
-        sender_cent = self.centrality_scores.get(sender, 0.0)
-        receiver_cent = self.centrality_scores.get(receiver, 0.0)
-        
-        # Contribution from low centrality
-        centrality_contribution = (1 - (sender_cent + receiver_cent) / 2.0) * 0.5
-        score += centrality_contribution
-        
-        if centrality_contribution > 0.3:
-            reasons.append("Interaction between isolated/low-activity accounts")
+        # REMOVED: Centrality-based anomaly (Interaction between isolated accounts) per user request
+        # REMOVED: Edge weight anomaly (Unusually high value) per user request
 
         # Community-based anomaly: transactions between different communities are suspicious
         sender_comm = self.communities.get(sender, -1)
@@ -115,21 +124,11 @@ class GraphAnomalyDetector:
             score += 0.3  # Cross-community transaction penalty
             reasons.append("Cross-Community Transaction (Unusual Group Interaction)")
 
-        # Edge weight anomaly: unusual transaction amounts/frequencies
-        edge_weight = self.edge_weights.get((sender, receiver), 0.0)
-        if edge_weight > 0:
-            # Normalize amount by edge weight (higher weight means more normal)
-            normalized_amount = amount / edge_weight
-            weight_contrib = min(normalized_amount, 1.0) * 0.2
-            score += weight_contrib 
-            
-            if normalized_amount > 2.0:
-                reasons.append("Unusually high value for this connection history")
-        else:
-            # New edge (not in training set? or just logic fallthrough)
-            # In this self-built graph, edge exists if we just built it from df.
-            # But if df is large, weight should be > 0.
-            pass
+        # Cycle Detection Check
+        if (sender, receiver) in self.edge_to_cycle_map:
+            score += 0.9
+            cycle_desc = self.edge_to_cycle_map[(sender, receiver)]
+            reasons.append(f"Money Laundering Loop Detected: {cycle_desc}")
 
         return min(score, 1.0), reasons
 
@@ -155,9 +154,68 @@ class GraphAnomalyDetector:
         # Detect communities
         self._detect_communities()
 
+        # DETECT CYCLES (Money Laundering Loops)
+        self.edge_to_cycle_map = {}
+        try:
+            # Only run on reasonable size graphs to avoid hanging
+            if self.graph.number_of_nodes() < 1000:
+                # nx.simple_cycles is expensive, but powerful for finding laundering rings
+                cycles = nx.simple_cycles(self.graph)
+                limit = 0
+                for cycle in cycles:
+                    limit += 1
+                    if limit > 2000: break # Safety break
+                    
+                    if 2 <= len(cycle) <= 6: # Filter for tight laundering loops
+                        # Check amounts consistency to ensure it's a "Money Pass-Through"
+                        cycle_amounts = []
+                        valid_cycle = True
+                        for i in range(len(cycle)):
+                            u = cycle[i]
+                            v = cycle[(i + 1) % len(cycle)]
+                            amt = self.edge_amounts.get((u, v), 0.0)
+                            cycle_amounts.append(amt)
+                        
+                        if not cycle_amounts: continue
+
+                        min_amt = min(cycle_amounts)
+                        max_amt = max(cycle_amounts)
+                        
+                        # If amounts are roughly consistent (min is at least 80% of max)
+                        # This catches 50k -> 49k -> 48k (ratio ~0.96)
+                        # But ignores 40k -> 100 -> 40k (ratio ~0.002) - i.e. buying coffee inside a loop
+                        
+                        if min_amt > 0 and (min_amt / max_amt) > 0.8:
+                            # Create descriptive string: A -> B -> C -> A
+                            avg_amt = sum(cycle_amounts) / len(cycle_amounts)
+                            cycle_str = " -> ".join(str(n) for n in cycle) + " -> " + str(cycle[0])
+                            # Add amount context
+                            cycle_str += f" (Avg Amount: {int(avg_amt)})"
+                            
+                            # Map each edge in the cycle to this description
+                            for i in range(len(cycle)):
+                                u = cycle[i]
+                                v = cycle[(i + 1) % len(cycle)] # wrap around to first node
+                                self.edge_to_cycle_map[(u, v)] = cycle_str
+        except Exception:
+            pass # Fail gracefully if graph algo fails
+
         # Identify columns
-        sender_col = 'sender' if 'sender' in df.columns else df.columns[0]
-        receiver_col = 'receiver' if 'receiver' in df.columns else df.columns[1]
+        # Identify columns (Smart detection - ensure consistency with _build_graph)
+        possible_senders = ['sender', 'source', 'user_id', 'origin_account']
+        possible_receivers = ['receiver', 'recipient', 'target', 'recipient_id', 'destination_account']
+        
+        sender_col = next((c for c in possible_senders if c in df.columns), df.columns[0])
+        receiver_col = next((c for c in possible_receivers if c in df.columns), None)
+        
+        if receiver_col is None:
+             if len(df.columns) > 1 and df.columns[1] != sender_col:
+                 receiver_col = df.columns[1]
+             elif len(df.columns) > 2:
+                 receiver_col = df.columns[2]
+             else:
+                 receiver_col = df.columns[-1]
+
         amount_col = 'amount' if 'amount' in df.columns else (df.columns[2] if len(df.columns) > 2 else None)
 
         # Compute scores for each transaction

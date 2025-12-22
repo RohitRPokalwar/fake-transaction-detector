@@ -7,7 +7,7 @@ class Preprocessor:
     """
 
     def __init__(self):
-        self.required_columns = ['transaction_id', 'user_id', 'amount', 'timestamp']
+        self.required_columns = ['transaction_id', 'user_id', 'amount', 'timestamp', 'location', 'recipient_id']
 
     def clean_data(self, df):
         """

@@ -32,9 +32,18 @@ class HybridScorer:
         ml_score = max(0.0, min(1.0, ml_score))
         graph_score = max(0.0, min(1.0, graph_score))
 
-        final_score = (self.rule_weight * rule_score +
+        weighted_score = (self.rule_weight * rule_score +
                       self.ml_weight * ml_score +
                       self.graph_weight * graph_score)
+        
+        # CRITICAL FIX: Rule & Graph Override
+        # 1. If a hard rule is broken, it's an anomaly.
+        # 2. If a Graph Anomaly (Loop/Isolation) is strong (>0.6), it's an anomaly.
+        #    (Graph weight is usually low (0.1), so we must override if the signal is strong)
+        
+        graph_override = graph_score if graph_score > 0.6 else 0.0
+        final_score = max(weighted_score, rule_score, graph_override)
+
         return final_score
 
     def auto_tune_threshold(self, rule_scores, ml_scores, graph_scores=None, true_labels=None):
@@ -54,13 +63,10 @@ class HybridScorer:
             optimal_idx = np.argmax(tpr - fpr)  # Maximize TPR - FPR
             self.threshold = thresholds[optimal_idx]
         else:
-            # Unsupervised tuning: Use percentile-based approach
-            scores = [
-                self.compute_hybrid_score(r, m, g or 0.0)
-                for r, m, g in zip(rule_scores, ml_scores, graph_scores or [0.0]*len(rule_scores))
-            ]
-            # Set threshold at 95th percentile for anomaly detection
-            self.threshold = np.percentile(scores, 95)
+            # Unsupervised tuning: Use fixed liberal threshold for Fraud Detection
+            # Percentile logic hides anomalies if there are many of them (like in a test file).
+            # self.threshold = np.percentile(scores, 95)
+            self.threshold = 0.55
 
         return self.threshold
 

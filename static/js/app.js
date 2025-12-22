@@ -268,6 +268,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const requiredColumns = [
                     "transaction_id",
                     "user_id",
+                    "recipient_id",
                     "amount",
                     "timestamp",
                     "location",
@@ -381,6 +382,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (totalTxnsEl) totalTxnsEl.textContent = total_transactions;
                     if (anomalousTxnsEl) anomalousTxnsEl.textContent = anomalous_count;
                     if (anomalyRateEl) anomalyRateEl.textContent = anomaly_rate;
+
+                    // Update new stats
+                    const avgAmountEl = document.getElementById("avgAmount");
+                    const activeUserEl = document.getElementById("activeUser");
+
+                    if (avgAmountEl && stats.mean_amount) avgAmountEl.textContent = `₹${stats.mean_amount.toFixed(2)}`;
+                    if (activeUserEl && stats.most_active_user_id) activeUserEl.textContent = stats.most_active_user_id;
                 }
 
                 if (scoreChart) scoreChart.update();
@@ -631,6 +639,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const amount = parseFloat(row.amount || 0);
 
+            // Determine status text
+            let statusText = "Normal";
+            let statusStyle = "color: #00ff9d;"; // Green for normal
+
+            if (row.is_anomalous) {
+                statusStyle = "color: #ff3b3b; font-weight: bold;"; // Red for anomalous
+                if (row.explanation && row.explanation.fraud_type) {
+                    statusText = row.explanation.fraud_type;
+                } else {
+                    statusText = "Anomalous";
+                }
+            }
+
             tr.innerHTML = `
         <td>${row.transaction_id || "N/A"}</td>
         <td>${row.user_id || "N/A"}</td>
@@ -640,7 +661,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     ? row.final_score.toFixed(3)
                     : "N/A"
                 }</td>
-        <td>${row.is_anomalous ? "Anomalous" : "Normal"}</td>
+        <td><span style="${statusStyle}">${statusText}</span></td>
       `;
 
             // Add click handler for modal (Transaction Details)

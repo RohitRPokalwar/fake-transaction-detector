@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTD System Architecture</title>
+    <style>
+        body {
+            background-color: #050510;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1 {
+            background: linear-gradient(90deg, #00d4ff, #bd00ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .diagram-container {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+            width: 90%;
+            height: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            overflow: auto;
+            /* Enable scrolling if diagram is large */
+        }
+
+        .mermaid {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#2d1b4e',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#bd00ff',
+                lineColor: '#00d4ff',
+                secondaryColor: '#0b1026',
+                tertiaryColor: '#1a1a2a'
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <h1>System Architecture: Fake Transaction Detector</h1>
+    <div class="diagram-container">
+        <div class="mermaid">
+            graph LR
+            subgraph Client ["💻 Client Layer"]
+            UI["Web Dashboard<br />React/Flask"]
+            Judge["Judge Interface"]
+            end
+
+            subgraph Backend ["⚙️ Server Core"]
+            API["Flask API"]
+
+            subgraph Brain ["🧠 Intelligence Engine"]
+            direction TB
+            DDIE["DDIE<br />(Rules)"]
+            UAIC["UAIC<br />(ML Model)"]
+            Graph["GraphNet<br />(Cycles)"]
+            end
+
+            Scorer{"Hybrid<br />Scorer"}
+            XAI["Explainability<br />Module"]
+            end
+
+            subgraph Data ["💾 Data Persistence"]
+            CSV[("CSV Files")]
+            Mem[("RAM Cache")]
+            end
+
+            Client ==> API
+            API --> Data
+            API ==> Brain
+
+            DDIE --> Scorer
+            UAIC --> Scorer
+            Graph --> Scorer
+
+            Scorer ==> XAI
+            XAI ==> API
+
+            style Client fill:#0b1026,stroke:#00d4ff,stroke-width:2px
+            style Brain fill:#180c2e,stroke:#bd00ff,stroke-width:2px,stroke-dasharray: 5 5
+            style Scorer fill:#bd00ff,stroke:#fff,stroke-width:4px,color:#fff
+            style API fill:#0f172a,stroke:#fff
+        </div>
+    </div>
+</body>
+
+</html>

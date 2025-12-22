@@ -60,6 +60,7 @@ class SSG:
             stats['unique_users'] = int(unique_users) if not pd.isna(unique_users) else 0
             stats['avg_transactions_per_user'] = float(avg_txns) if not pd.isna(avg_txns) else 0.0
             stats['max_transactions_per_user'] = int(max_txns) if not pd.isna(max_txns) else 0
+            stats['most_active_user_id'] = str(user_counts.idxmax()) if not user_counts.empty else "N/A"
 
         return stats
 

@@ -1,0 +1,11 @@
+transaction_id,user_id,recipient_id,amount,timestamp,location
+TXN-105,User_E,User_F,500,2025-01-01 11:00:00,Chennai
+TXN-106,User_E,User_G,600,2025-01-01 11:10:00,Chennai
+TXN-107,User_E,User_H,550,2025-01-01 11:20:00,Chennai
+TXN-108,User_E,User_I,700,2025-01-01 11:30:00,Chennai
+TXN-109,User_E,User_J,450,2025-01-01 11:40:00,Chennai
+TXN-110,User_E,User_K,800,2025-01-01 11:50:00,Chennai
+TXN-111,User_E,User_L,300,2025-01-01 12:00:00,Chennai
+TXN-112,User_E,User_M,900,2025-01-01 12:10:00,Chennai
+TXN-113,User_E,User_N,400,2025-01-01 12:20:00,Chennai
+TXN-114,User_Z,User_Y,500,2025-01-01 13:00:00,Mumbai
