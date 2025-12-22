@@ -97,4 +97,3 @@ This project addresses the **Fintech/Security** problem statement.
 *   **Pitch Script:** [View Script](./TechFiesta_PRESENTATION_SCRIPT.md)
 
 ---
-*Created by Team Antigravity*
