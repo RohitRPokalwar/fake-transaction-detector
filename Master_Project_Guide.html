@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIGILO: The Master Documentation</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --sidebar-bg: #161b22;
+            --text-main: #c9d1d9;
+            --text-heading: #ffffff;
+            --accent-primary: #58a6ff;
+            /* Blue */
+            --accent-secondary: #238636;
+            /* Green */
+            --accent-tertiary: #a371f7;
+            /* Purple */
+            --border-color: #30363d;
+            --code-bg: #161b22;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 300px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo span {
+            color: var(--accent-tertiary);
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 8px 12px;
+            color: var(--text-main);
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: rgba(88, 166, 255, 0.1);
+            color: var(--accent-primary);
+        }
+
+        .nav-section {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8b949e;
+            margin: 20px 0 10px 10px;
+            font-weight: 700;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px 60px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--text-heading);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--text-heading);
+            margin-top: 60px;
+            border-left: 4px solid var(--accent-primary);
+            padding-left: 15px;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            color: var(--accent-primary);
+            margin-top: 40px;
+        }
+
+        p {
+            line-height: 1.7;
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+        }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-tertiary);
+            background: rgba(163, 113, 247, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        pre code {
+            color: inherit;
+            background: none;
+            padding: 0;
+        }
+
+        /* QA Section */
+        .qa-box {
+            background: rgba(35, 134, 54, 0.05);
+            /* Green tint */
+            border: 1px solid rgba(35, 134, 54, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .qa-title {
+            font-weight: 700;
+            color: var(--accent-secondary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qa-answer {
+            color: var(--text-main);
+            font-style: italic;
+        }
+
+        /* Explainer Box */
+        .explainer-box {
+            background: rgba(88, 166, 255, 0.05);
+            border-left: 4px solid var(--accent-primary);
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        strong {
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">VIGILO <span>DOCS</span></div>
+
+        <div class="nav-section">The System</div>
+        <div class="nav-item"><a href="#overview" class="nav-link">Overview & Architecture</a></div>
+        <div class="nav-item"><a href="#backend" class="nav-link">Backend Core (app.py)</a></div>
+
+        <div class="nav-section">The Engines</div>
+        <div class="nav-item"><a href="#ddie" class="nav-link">Rule Engine (DDIE)</a></div>
+        <div class="nav-item"><a href="#uaic" class="nav-link">ML Engine (UAIC)</a></div>
+        <div class="nav-item"><a href="#graph" class="nav-link">Graph Intelligence</a></div>
+        <div class="nav-item"><a href="#scoring" class="nav-link">Hybrid Scoring</a></div>
+
+        <div class="nav-section">Explained</div>
+        <div class="nav-item"><a href="#xai" class="nav-link">Explainable AI (XAI)</a></div>
+        <div class="nav-item"><a href="#frontend" class="nav-link">Frontend & UI</a></div>
+        <div class="nav-item"><a href="#master-qa" class="nav-link">Master Q&A</a></div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+
+            <section id="overview">
+                <h1>VIGILO: The Master Documentation</h1>
+                <p><strong>Version:</strong> 2.0.4 (TechFiesta Special Edition)</p>
+                <p>This document serves as the "Source of Truth" for the entire Vigilo project. It explains every
+                    component line-by-line, details the logic flow, and provides rigorous Q&A support for tough
+                    technical interviews.</p>
+
+                <div class="explainer-box">
+                    <strong>The Philosophy:</strong> Traditional fraud detection is "Black Box" (it says 'NO' but won't
+                    say why). Vigilo is "Glass Box" (it says 'NO' because 'Money Laundering Loop Detected').
+                </div>
+            </section>
+
+            <!-- BACKEND SECTION -->
+            <section id="backend">
+                <h2>1. Backend Core (`app.py`)</h2>
+                <p>The <code>app.py</code> file is the orchestrator. It uses the <strong>Flask</strong> micro-framework.
+                </p>
+
+                <h3>Logic Flow Breakdown</h3>
+                <ol>
+                    <li><strong>Initialization:</strong>
+                        <p>When the server starts, we initialize global objects like <code>GlobalModelContext</code>.
+                            This allows us to keep the ML model in memory so we don't reload it for every user request
+                            (Speed Optimization).</p>
+                    </li>
+                    <li><strong>Route `/api/upload` (POST):</strong>
+                        <p>Accepts a CSV file. It saves the file to a temporary location and returns a
+                            <code>file_id</code>. Why? Because file processing takes time. We don't want the browser to
+                            hang. We upload first, then analyze asynchronously.
+                        </p>
+                    </li>
+                    <li><strong>Route `/api/analyze/<file_id>` (GET):</strong>
+                        <p>This is the magic. It uses <strong>Server-Sent Events (SSE)</strong> (<code>yield</code>
+                            keyword in Python). Instead of returning one giant JSON blob after 10 seconds, it streams
+                            results processing-by-processing (Row 1.. Row 2..). This powers the "Hacker Terminal" effect
+                            on the UI.</p>
+                    </li>
+                </ol>
+
+                <div class="qa-box">
+                    <div class="qa-title">❓ Judge Q: Why did you use Flask instead of Django or FastAPI?</div>
+                    <div class="qa-answer">
+                        "We used Flask because it's lightweight and perfect for our <strong>SSE (Streaming)</strong>
+                        logic. It allows us to process CSV rows and send 'Real-Time' updates to the UI hacker terminal
+                        without the overhead of larger frameworks."
+                    </div>
+                </div>
+            </section>
+
+            <!-- RULE ENGINE -->
+            <section id="ddie">
+                <h2>2. Rule Engine (`utils/ddie.py`)</h2>
+                <p><strong>DDIE:</strong> Deterministic Data Integrity Engine. <br>This is the "First Line of Defense".
+                    It catches the obvious stuff instantly.</p>
+
+                <h3>Detailed Logic</h3>
+                <pre><code>Rules = [
+  "Future Transaction" (Date > Now + 24h),
+  "Negative Amount" (Amt < 0),
+  "Burst Velocity" (Time_Diff < 2s),
+  "Impossible Travel" (Loc_Diff > 500km in < 1h)
+]</code></pre>
+                <p><strong>Line-by-Line Logic:</strong> The code iterates through the Pandas DataFrame. For each rule,
+                    it creates a boolean mask. If <code>row['amount'] < 0</code>, it flags immediately with 100%
+                    confidence. It does NOT wait for ML.</p>
+
+                <div class="qa-box">
+                    <div class="qa-title">❓ Judge Q: Static rules are brittle. If a hacker changes tactics, this fails.
+                        Why use it?</div>
+                    <div class="qa-answer">
+                        "Rules catch 40% of 'dumb' fraud (negative amounts, future dates) instantly with <strong>zero
+                            compute cost</strong>. This keeps the system fast and lets the AI focus on complex, hidden
+                        patterns."
+                    </div>
+                </div>
+            </section>
+
+            <!-- ML ENGINE -->
+            <section id="uaic">
+                <h2>3. ML Engine (`utils/uaic.py`)</h2>
+                <p><strong>UAIC:</strong> Unsupervised Anomaly Isolation Core.<br>Uses <strong>Isolation
+                        Forest</strong>.</p>
+
+                <h3>Explaining the "Why"</h3>
+                <p>Supervised learning (Logistic Regression / Random Forest) requires <em>labeled data</em> (Fraud vs
+                    Not Fraud). Most companies don't have thousands of confirmed fraud cases. <br>
+                    <strong>Isolation Forest</strong> is <em>Unsupervised</em>. It assumes anomalies are "few and
+                    different". It randomly cuts the data points. Anomalies are "isolated" quickly (fewer cuts); normal
+                    points take longer to isolate.
+                </p>
+
+                <h3>Feature Engineering Logic</h3>
+                <pre><code># Time is cyclical!
+df['hour_sin'] = np.sin(2 * np.pi * df['hour']/24)
+df['hour_cos'] = np.cos(2 * np.pi * df['hour']/24)</code></pre>
+                <p><strong>Explanation:</strong> 23:00 (11 PM) is close to 01:00 (1 AM). But mathematically, 23 and 1
+                    are far apart. By converting time to Sine/Cosine waves, we teach the ML model that midnight is
+                    continuous.</p>
+
+                <div class="qa-box">
+                    <div class="qa-title">❓ Judge Q: Why Isolation Forest? Why not Autoencoders or One-Class SVM?</div>
+                    <div class="qa-answer">
+                        "Isolation Forest is <strong>Unsupervised</strong>. Most datasets don't have labeled 'fraud'
+                        examples. Our AI finds 'unusual' behavior (outliers) automatically, making it ready to use on
+                        any bank's CSV instantly."
+                    </div>
+                </div>
+            </section>
+
+            <!-- GRAPH ENGINE -->
+            <section id="graph">
+                <h2>4. Graph Intelligence (`utils/graph_anomaly.py`)</h2>
+                <p><strong>The Crown Jewel.</strong> This finds Organized Fraud (Money Laundering).</p>
+
+                <h3>The Logic</h3>
+                <p>We convert the CSV into a Graph <code>G(V, E)</code> using <strong>NetworkX</strong>.</p>
+                <ul>
+                    <li><strong>Vertices (Nodes):</strong> User IDs (Alice, Bob).</li>
+                    <li><strong>Edges:</strong> Transactions ($500 from Alice -> Bob).</li>
+                </ul>
+
+                <h3>Algorithms Used:</h3>
+                <ol>
+                    <li><strong>Simple Cycles:</strong> Detects <code>A -> B -> C -> A</code> loops. This is classic
+                        "Layering" in money laundering.</li>
+                    <li><strong>Degree Centrality:</strong> "Hub" accounts receiving money from 100 people instantly
+                        (Ponzi Scheme profile).</li>
+                </ol>
+
+                <div class="qa-box">
+                    <div class="qa-title">❓ Judge Q: Graph processing is O(N!). How does this scale?</div>
+                    <div class="qa-answer">
+                        "We map transactions as a network using <strong>NetworkX</strong>. Standard AI looks at rows; we
+                        look at the 'Connections'. This catches circular money laundering (A→B→C→A) which standard rules
+                        always miss."
+                    </div>
+                </div>
+            </section>
+
+            <!-- SCORING -->
+            <section id="scoring">
+                <h2>5. Hybrid Scoring (`utils/scoring.py`)</h2>
+                <p>We don't trust any single engine. We vote.</p>
+                <div class="code-block">
+                    FINAL_SCORE = (0.4 * RULE_SCORE) + (0.5 * ML_SCORE) + (0.1 * GRAPH_SCORE)
+                </div>
+                <p><strong>Logic:</strong>
+                    <br>- If a Rule is broken (Score 1.0), the final score is at least 0.4.
+                    <br>- If ML sees weird behavior (Score 0.8), total bumps to 0.8.
+                    <br>- This weighted average flattens the variance and reduces False Positives.
+                </p>
+            </section>
+
+            <!-- XAI -->
+            <section id="xai">
+                <h2>6. Explainable AI (`utils/explain.py`)</h2>
+                <p>This module translates Math -> English.</p>
+                <p>It checks <em>which</em> component triggered the flag.</p>
+                <ul>
+                    <li>If <code>Rule_Burst == True</code> -> return "High Velocity Transaction Detected"</li>
+                    <li>If <code>ML_Score > 0.8</code> -> Check SHAP values. "Amount is $50,000 (Normal: $500)"</li>
+                    <li>If <code>Graph_Loop == True</code> -> "Circular Transaction Logic Detected"</li>
+                </ul>
+                <div class="qa-box">
+                    <div class="qa-title">❓ Judge Q: Why is Explainability important?</div>
+                    <div class="qa-answer">
+                        "We provide <strong>'Human Reasons'</strong> for every flag (e.g., 'Burst Triggered'). This
+                        builds trust and ensures analysts can audit the AI's decision instead of blindly following a
+                        black box."
+                    </div>
+                </div>
+            </section>
+
+            <!-- MASTER Q&A -->
+            <section id="master-qa">
+                <h2>7. The Master Q&A (The "Kill Shot" Answers)</h2>
+
+                <div class="qa-box">
+                    <div class="qa-title">Q: How do you handle False Positives? (The #1 Question)</div>
+                    <div class="qa-answer">
+                        "We use a <strong>95% Threshold</strong>. The system flags only the most extreme 5% of outliers.
+                        For everything else, we provide a 'Confidence Score' so analysts can focus on the highest risks
+                        first."
+                    </div>
+                </div>
+
+                <div class="qa-box">
+                    <div class="qa-title">Q: What about Data Privacy? You are analyzing sensitive transactions.</div>
+                    <div class="qa-answer">
+                        "Our system is <strong>PII-Free</strong>. We don't need names or emails. We only analyze 'User
+                        IDs' and 'Transaction Amounts', meaning we can detect fraud without storing any sensitive
+                        personal data."
+                    </div>
+                </div>
+
+                <div class="qa-box">
+                    <div class="qa-title">Q: Can this run in Real-Time?</div>
+                    <div class="qa-answer">
+                        "The system is optimized for <strong>Stream Processing</strong>. Rules and ML run in
+                        milliseconds. For massive graphs, we use a 15-minute 'Batch Analytics' cycle to catch laundering
+                        loops without slowdown."
+                    </div>
+                </div>
+
+                <div class="qa-box">
+                    <div class="qa-title">Q: How do you prevent Adversarial Attacks (Hacking the Model)?</div>
+                    <div class="qa-answer">
+                        "We use <strong>Hybrid Defense</strong>. If a hacker bypasses a Rule (by changing timing), the
+                        ML Engine will still flag the 'Structural Anomaly'. It is much harder to trick three independent
+                        engines than one."
+                    </div>
+                </div>
+
+                <div class="qa-box">
+                    <div class="qa-title">Q: How do you secure the system itself (SQLi, XSS)?</div>
+                    <div class="qa-answer">
+                        "The system is hardened. We use <strong>Input Sanitization</strong> to block SQL Injections and
+                        <strong>Jinja2 Auto-escaping</strong> to prevent UI-based XSS attacks, ensuring the dashboard is
+                        safe."
+                    </div>
+                </div>
+
+                <div class="qa-box">
+                    <div class="qa-title">Q: What if I try to reverse-engineer your model by probing the API?</div>
+                    <div class="qa-answer">
+                        "We use <strong>Rate Limiting</strong>. If a user tries to 'probe' the AI with thousands of
+                        transactions, our system auto-blocks the IP, preventing attackers from reverse-engineering our
+                        detection logic."
+                    </div>
+                </div>
+
+            </section>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

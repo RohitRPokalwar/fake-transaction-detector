@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, Response
+from flask import Flask, request, jsonify, render_template, Response, send_file
 import pandas as pd
 import logging
 import traceback
@@ -139,6 +139,21 @@ def live_analyzer():
 def architecture():
     """Serve the system architecture visualization."""
     return render_template('architecture.html')
+
+@app.route('/guide')
+def project_guide():
+    """Serve the Master Project Guide."""
+    return send_file('Master_Project_Guide.html')
+
+@app.route('/simple-guide')
+def simple_guide():
+    """Serve the simplified presentation guide."""
+    return send_file('Vigilo_Simple_Guide.html')
+
+@app.route('/presentation')
+def view_presentation():
+    """Serve the interactive HTML presentation."""
+    return send_file('Presentation.html')
 
 @app.route('/api/analyze/<file_id>', methods=['GET'])
 def analyze(file_id):

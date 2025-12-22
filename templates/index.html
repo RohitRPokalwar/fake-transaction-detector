@@ -55,12 +55,13 @@
                     <input type="file" id="fileInput" accept=".csv" hidden>
                 </div>
             </div>
-            <div style="text-align: center; margin-top: 20px;">
+            <div
+                style="text-align: center; margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
                 <button id="analyzeBtn" class="btn-primary" disabled>Analyze Transactions</button>
                 <button id="requirementsBtn" class="btn-secondary-outline">CSV Requirements</button>
-                <a href="/live" class="btn-secondary-outline">
-                    🚀 LAUNCH LIVE ANALYZER
-                </a>
+                <a href="/live" class="btn-secondary-outline">🚀 LIVE ANALYZER</a>
+                <a href="/presentation" class="btn-secondary-outline">📊 PRESENTATION</a>
+                <a href="/simple-guide" class="btn-secondary-outline">📖 SIMPLE GUIDE</a>
             </div>
 
             <div id="terminalLoader" class="cyber-loader-overlay" style="display: none;">

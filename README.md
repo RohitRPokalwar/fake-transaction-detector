@@ -17,7 +17,7 @@ Most importantly, it provides **Explainable AI (XAI)**—telling you *exactly wh
 
 ## 🚀 Key Features
 *   **🕷️ Hybrid Scoring Engine:** Combines Hard Rules + Graph Logic + ML Scores.
-*   **📊 Dark Neo-Fintech Dashboard:** Professional, high-contrast UI for SOC analysts.
+*   **🖥️ Cyber-Security HUD:** Futuristic holographic interface with real-time reactor-core loaders.
 *   **🔄 Advanced Loop Detection:** Identifies A -> B -> C -> A washing schemes using NetworkX.
 *   **⚡ High Velocity Detection:** Flags "Burst" attacks (bot scripts) in <2ms.
 *   **🌍 Impossible Travel:** Detects geospatial conflicts (e.g., Mumbai -> London in 5 mins).
@@ -56,7 +56,7 @@ ProJ/
 ---
 
 ## 🛠️ Tech Stack
-*   **Frontend:** HTML5, CSS3 (Custom Neo-Fintech Theme), JavaScript
+*   **Frontend:** HTML5, CSS3 (Cyber-Security HUD Theme), JavaScript
 *   **Backend:** Python 3.x, Flask
 *   **Data Science:** Pandas, NumPy, Scikit-Learn
 *   **Graph:** NetworkX

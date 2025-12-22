@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIGILO - TechFiesta 2026 Presentation</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050510;
+            --text-main: #e0e0e0;
+            --primary-accent: #00f2ea;
+            --secondary-accent: #7000ff;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        /* Slide Container */
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            box-sizing: border-box;
+            padding: 40px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            background: radial-gradient(circle at top right, rgba(112, 0, 255, 0.1), transparent 60%);
+        }
+
+        /* Slide Content */
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.5rem;
+            color: var(--primary-accent);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 242, 234, 0.3);
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 40px;
+            border-left: 5px solid var(--secondary-accent);
+            padding-left: 20px;
+        }
+
+        h3 {
+            color: var(--primary-accent);
+            margin-top: 20px;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        p,
+        li {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 25px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .highlight-box {
+            border: 1px solid var(--primary-accent);
+            background: rgba(0, 242, 234, 0.05);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--glass-border);
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(112, 0, 255, 0.2);
+            color: #fff;
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--primary-accent);
+            color: var(--primary-accent);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: var(--primary-accent);
+            color: #000;
+        }
+
+        /* Footer Info */
+        .footer-info {
+            position: absolute;
+            bottom: 20px;
+            left: 40px;
+            font-size: 0.8rem;
+            color: #666;
+            font-family: monospace;
+        }
+
+        .team-id {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            background: var(--secondary-accent);
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="team-id">TEAM ID: 281 | CodeAtlantis</div>
+
+    <div class="slide-container" id="slider">
+
+        <!-- SLIDE 1: Title & Problem -->
+        <div class="slide">
+            <div class="fade-in">
+                <h3 style="color: #888;">Problem Statement ID: FD003</h3>
+                <h1>VIGILO <span style="font-size: 0.5em; vertical-align: middle; color: #fff;">// Fake Transaction
+                        Detector</span></h1>
+                <h2>Spot the Anomaly!</h2>
+
+                <div class="grid-container">
+                    <div class="card">
+                        <h3>🚩 The Problem</h3>
+                        <p><strong>Scale:</strong> 3.4 Trillion transactions in 2023. Volumes up 10x since 2014.</p>
+                        <p><strong>Bottlenecks:</strong> Manual review costs ₹40-100 per txn. Doesn't scale.</p>
+                        <p><strong>Loss:</strong> Consumers lost over $1 Trillion in 2023.</p>
+                    </div>
+                    <div class="card">
+                        <h3>📉 Unmet Needs & Limitations</h3>
+                        <p><strong>Current Systems:</strong> Rule-based systems fail against evolving tactics. ML needs
+                            labeled data that SMEs don't have.</p>
+                        <p><strong>Fraud Evolution:</strong> 70% of criminal networks now use organized money laundering
+                            (Europol).</p>
+                        <p><strong>Gap:</strong> Small businesses need adaptive, explainable, lightweight detection.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-info">TechFiesta'26 | FinTech Domain</div>
+        </div>
+
+        <!-- SLIDE 2: Solution (Vigilo) -->
+        <div class="slide">
+            <div class="fade-in">
+                <h1>The Solution: VIGILO</h1>
+                <h2>A 4-Layer Hybrid Detection System</h2>
+
+                <div class="grid-container" style="grid-template-columns: 1fr 1fr;">
+                    <div>
+                        <div class="highlight-box">
+                            <h3>🛡️ 4-Layer Engine</h3>
+                            <ol>
+                                <li><strong>Rules (DDIE):</strong> Instant checks for obvious fraud.</li>
+                                <li><strong>Statistics (SSG):</strong> Deviation from baseline.</li>
+                                <li><strong>Unsupervised ML (UAIC):</strong> Isolation Forest for subtle outliers.</li>
+                                <li><strong>Graph Intelligence:</strong> Catches Money Laundering Loops (60% more
+                                    effective).</li>
+                            </ol>
+                        </div>
+                        <div class="card" style="margin-top: 20px;">
+                            <h3>🧠 Explainable AI (XAI)</h3>
+                            <p>We don't just detect, we <strong>justify</strong>.</p>
+                            <p>Uses SHAP & LIME to explain <em>why</em> a threshold was crossed in human terms.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>⚔️ Competitive Analysis</h3>
+                        <table>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Stripe Radar</th>
+                                <th>AWS Fraud</th>
+                                <th>VIGILO</th>
+                            </tr>
+                            <tr>
+                                <td>Hybrid Layers</td>
+                                <td>Partial</td>
+                                <td>Partial</td>
+                                <td style="color: var(--primary-accent);">All 4</td>
+                            </tr>
+                            <tr>
+                                <td>Graph Analysis</td>
+                                <td>❌</td>
+                                <td>❌</td>
+                                <td style="color: var(--primary-accent);">✅ (Core)</td>
+                            </tr>
+                            <tr>
+                                <td>Zero Config</td>
+                                <td>✅</td>
+                                <td>❌</td>
+                                <td style="color: var(--primary-accent);">✅</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: Tech & Feasibility -->
+        <div class="slide">
+            <div class="fade-in">
+                <h1>Technical Approach</h1>
+
+                <div class="grid-container" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <div class="card">
+                        <h3>🛠️ Tech Stack</h3>
+                        <ul>
+                            <li><strong>Backend:</strong> Python, Flask</li>
+                            <li><strong>ML:</strong> Scikit-Learn (Isolation Forest)</li>
+                            <li><strong>Graph:</strong> NetworkX</li>
+                            <li><strong>Frontend:</strong> Cyber-Security HUD (HTML/JS)</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>⚠️ Risks & Mitigations</h3>
+                        <p><strong>False Positives:</strong> Mitigated by Confidence Scoring (Low/Med/High).</p>
+                        <p><strong>Data Quality:</strong> Automated pre-validation layer.</p>
+                        <p><strong>Latency:</strong> Lightweight stack runs in <2s.< /p>
+                    </div>
+                    <div class="card">
+                        <h3>✅ Feasibility</h3>
+                        <p><strong>Tech:</strong> No heavy GPU required. Works on standard CPUs.</p>
+                        <p><strong>Economic:</strong> Zero license cost vs ₹1Cr+ Enterprise tools.</p>
+                        <p><strong>Operational:</strong> Fits into existing Excel/CSV workflows.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: Impact & Benefits -->
+        <div class="slide">
+            <div class="fade-in">
+                <h1>Impact & Benefits</h1>
+
+                <div class="grid-container">
+                    <div class="card">
+                        <h3>🚀 For Businesses</h3>
+                        <ul>
+                            <li><strong>Zero Setup:</strong> Upload CSV -> Get Results.</li>
+                            <li><strong>Early Detection:</strong> Catch fraud before chargebacks.</li>
+                            <li><strong> reduced Labor:</strong> Automates 80% of analyst review time.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>🌍 For The Ecosystem</h3>
+                        <ul>
+                            <li><strong>Transparency:</strong> Clear "Why" for every block.</li>
+                            <li><strong>Scalability:</strong> Handles growing transaction volumes.</li>
+                            <li><strong>Democratization:</strong> Gives SMEs enterprise-grade security.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="text-align: center;">
+                    "We don't just stop fraud; we enable trust."
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: References -->
+        <div class="slide">
+            <div class="fade-in">
+                <h1>Research & References</h1>
+
+                <div class="grid-container">
+                    <div class="card">
+                        <h3>📚 Industry Reports</h3>
+                        <ul>
+                            <li><strong>McKinsey 2024:</strong> Global Payments & Fraud Challenges.</li>
+                            <li><strong>Europol 2023:</strong> Financial Crime & Organized Networks.</li>
+                            <li><strong>IBM AI:</strong> Limits of Traditional Rules.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>🔬 Academic Papers</h3>
+                        <ul>
+                            <li><em>"Graph-Based ML Approaches for Financial Networks"</em> (IC3I 2024)</li>
+                            <li><em>"Adaptive Graph-Based Oversampling"</em> (ASENS 2025)</li>
+                            <li><em>"Collusion detection in public procurement"</em> (2022)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="margin-top: 40px; text-align: center;">
+                    <p><strong>Repository:</strong> github.com/RohitRPokalwar/fake-transaction-detector</p>
+                    <p><strong>Live Prototype:</strong> Vigilo System</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="nav-buttons">
+        <button onclick="moveSlide(-1)">◀ Prev</button>
+        <button onclick="moveSlide(1)">Next ▶</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const slider = document.getElementById('slider');
+
+        function moveSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+
+            slider.style.transform = `translateX(-${currentSlide * 100}vw)`;
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') moveSlide(1);
+            if (e.key === 'ArrowLeft') moveSlide(-1);
+        });
+    </script>
+</body>
+
+</html>

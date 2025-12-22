@@ -8,12 +8,45 @@ class Preprocessor:
 
     def __init__(self):
         self.required_columns = ['transaction_id', 'user_id', 'amount', 'timestamp', 'location', 'recipient_id']
+        self.aliases = {
+            'transaction_id': ['txn_id', 'trans_id', 'id', 'transaction'],
+            'user_id': ['sender_id', 'sender', 'customer_id', 'user', 'sender name'],
+            'amount': ['amt', 'value', 'price', 'transaction_amount', 'transaction amount'],
+            'timestamp': ['date', 'time', 'trans_date', 'txn_date', 'datetime'],
+            'location': ['city', 'geo', 'coordinates', 'address', 'place'],
+            'recipient_id': ['receiver_id', 'to_id', 'recipient', 'receiver', 'receiver name']
+        }
+
+    def _map_columns(self, df):
+        """Map alternative column names to required column names."""
+        current_cols = [c.lower() for c in df.columns]
+        mapping = {}
+        
+        for required_col, alt_names in self.aliases.items():
+            # If standard name is already present (case-insensitive), skip mapping
+            if required_col in current_cols:
+                continue
+            
+            # Look for aliases
+            for alias in alt_names:
+                if alias in current_cols:
+                    # Find the original case sensitive column name
+                    original_name = df.columns[current_cols.index(alias)]
+                    mapping[original_name] = required_col
+                    break
+        
+        if mapping:
+            df = df.rename(columns=mapping)
+        return df
 
     def clean_data(self, df):
         """
         Clean and preprocess the dataframe.
         """
-        # Convert column names to lowercase
+        # Map aliases first
+        df = self._map_columns(df)
+
+        # Convert column names to lowercase for consistency
         df.columns = df.columns.str.lower()
 
         # Check for required columns
