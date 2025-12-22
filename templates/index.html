@@ -16,18 +16,18 @@
 
 <body>
     <!-- Initial Full Screen Loader -->
+    <!-- Initial Full Screen Loader -->
     <div id="initialLoader" class="initial-loader">
-        <div class="terminal-window">
-            <div class="terminal-header">
-                <div class="terminal-dot red"></div>
-                <div class="terminal-dot yellow"></div>
-                <div class="terminal-dot green"></div>
-                <div class="terminal-title">boot_sequence.sh</div>
+        <div class="cyber-hud">
+            <div class="cyber-spinner-container">
+                <div class="cyber-spinner-ring"></div>
+                <div class="cyber-spinner-core"></div>
             </div>
-            <div class="terminal-body">
-                <div id="bootText" class="terminal-text"></div>
-                <div class="terminal-cursor">_</div>
+            <div class="cyber-text-container">
+                <div id="bootText" class="cyber-text"></div>
+                <div class="cyber-cursor">_</div>
             </div>
+            <div class="cyber-scan-line"></div>
         </div>
     </div>
 
@@ -63,17 +63,12 @@
                 </a>
             </div>
 
-            <div id="terminalLoader" class="terminal-loader" style="display: none;">
-                <div class="terminal-loader-window">
-                    <div class="terminal-loader-header">
-                        <div class="dot red"></div>
-                        <div class="dot yellow"></div>
-                        <div class="dot green"></div>
-                        <div class="title">system_process.exe</div>
-                    </div>
-                    <div class="terminal-loader-body">
-                        <div id="terminalLoaderText" class="terminal-loader-text"></div>
-                        <div class="terminal-cursor">_</div>
+            <div id="terminalLoader" class="cyber-loader-overlay" style="display: none;">
+                <div class="cyber-hud-small">
+                    <div class="cyber-spinner-small"></div>
+                    <div class="cyber-text-container-small">
+                        <div id="terminalLoaderText" class="cyber-text-small"></div>
+                        <div class="cyber-cursor">_</div>
                     </div>
                 </div>
             </div>
@@ -187,50 +182,43 @@
 
         <!-- CSV Requirements Modal -->
         <div id="requirementsModal" class="modal" style="display: none;">
-            <div class="terminal-content">
-                <div class="terminal-header">
-                    <div class="terminal-dot red close-requirements"></div>
-                    <div class="terminal-dot yellow"></div>
-                    <div class="terminal-dot green"></div>
-                    <div class="terminal-title">requirements.txt</div>
+            <div class="cyber-modal-content">
+                <div class="cyber-modal-header">
+                    <h3>DATA_INGESTION_PROTOCOLS</h3>
+                    <span class="close-requirements cyber-close">&times;</span>
                 </div>
-                <div class="terminal-body">
-                    <div class="terminal-line">> CAT REQUIREMENTS.TXT</div>
-                    <div class="terminal-line">> REQUIRED_COLUMNS:</div>
-                    <ul class="requirements-list terminal-list">
-                        <li>- transaction_id <span class="comment"># Unique ID</span></li>
-                        <li>- user_id <span class="comment"># User Identifier</span></li>
-                        <li>- recipient_id <span class="comment"># Recipient Identifier</span></li>
-                        <li>- amount <span class="comment"># Transaction Value</span></li>
-                        <li>- timestamp <span class="comment"># ISO 8601 Format</span></li>
-                        <li>- location <span class="comment"># Geo Location</span></li>
+                <div class="cyber-modal-body">
+                    <p class="cyber-instruction">> UPLOAD_FORMAT: .CSV</p>
+                    <p class="cyber-instruction">> REQUIRED_SCHEMA:</p>
+                    <ul class="cyber-list">
+                        <li><span>transaction_id</span> <small>// Unique ID</small></li>
+                        <li><span>user_id</span> <small>// User Identifier</small></li>
+                        <li><span>recipient_id</span> <small>// Recipient Identifier</small></li>
+                        <li><span>amount</span> <small>// Transaction Value</small></li>
+                        <li><span>timestamp</span> <small>// ISO 8601 Format</small></li>
+                        <li><span>location</span> <small>// Geo Location</small></li>
                     </ul>
-                    <div class="terminal-line">> NOTE: EXTRA_COLUMNS_IGNORED</div>
-                    <div class="terminal-line blink">_</div>
+                    <p class="cyber-instruction">> NOTE: EXTRA_FIELDS_DISCARDED</p>
                     <div style="text-align: right; margin-top: 20px;">
-                        <button class="btn-terminal close-requirements">CLOSE_SESSION</button>
+                        <button class="btn-primary-small close-requirements">CLOSE_PROTOCOL</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Terminal Error Modal -->
+        <!-- System Error Modal -->
         <div id="terminalErrorModal" class="modal" style="display: none;">
-            <div class="terminal-content">
-                <div class="terminal-header">
-                    <div class="terminal-dot red"></div>
-                    <div class="terminal-dot yellow"></div>
-                    <div class="terminal-dot green"></div>
-                    <div class="terminal-title">system_error.log</div>
+            <div class="cyber-modal-content error-mode">
+                <div class="cyber-modal-header">
+                    <h3 class="text-danger">SYSTEM_CRITICAL_ERROR</h3>
+                    <!-- Close button handled by script via ID usually, but adding visual close is good -->
                 </div>
-                <div class="terminal-body">
-                    <div class="terminal-line">> INITIATING_UPLOAD_SEQUENCE...</div>
-                    <div class="terminal-line error">> FATAL_ERROR: INVALID_CSV_STRUCTURE</div>
-                    <div class="terminal-line">> ANALYZING_HEADERS...</div>
-                    <div id="terminalErrorList" class="terminal-line error"></div>
-                    <div class="terminal-line blink">_</div>
+                <div class="cyber-modal-body">
+                    <p class="cyber-instruction text-danger">> UPLOAD_SEQUENCE_FAILED</p>
+                    <p class="cyber-instruction">> DIAGNOSTIC_REPORT:</p>
+                    <div id="terminalErrorList" class="cyber-error-log"></div>
                     <div style="text-align: right; margin-top: 20px;">
-                        <button id="closeTerminalBtn" class="btn-terminal">ACKNOWLEDGE_ERROR</button>
+                        <button id="closeTerminalBtn" class="btn-error-small">ACKNOWLEDGE</button>
                     </div>
                 </div>
             </div>

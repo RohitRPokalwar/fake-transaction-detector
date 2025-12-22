@@ -793,12 +793,52 @@ document.addEventListener("DOMContentLoaded", function () {
             userProfileBody.innerHTML = `<p class="error-text">Failed to load profile: ${error.message}</p>`;
         }
     }
+    function downloadCSV() {
+        if (!allResults || allResults.length === 0) return;
 
+        // Filter only Anomalous based on `is_anomalous` flag
+        const anomalousRows = allResults.filter(r => r.is_anomalous);
+
+        if (anomalousRows.length === 0) {
+            alert("No anomalous transactions found in the analysis results.");
+            return;
+        }
+
+        // CSV Header
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Transaction ID,User ID,Recipient ID,Amount,Timestamp,Location,Final Score,Status,Reason\n";
+
+        anomalousRows.forEach(row => {
+            // Logic to strip HTML from explanation to get plain text reason
+            let reason = "Anomalous";
+            if (row.explanation) {
+                // Simple regex to strip HTML tags and clean up text
+                let temp = row.explanation.replace(/<[^>]*>/g, " "); // Replace tags with space
+                temp = temp.replace(/&nbsp;/g, " ");
+                temp = temp.replace(/[\r\n]+/g, " "); // Remove newlines
+                temp = temp.replace(/\s+/g, " ").trim(); // Collapse spaces
+                reason = temp.replace(/,/g, ";"); // Replace commas to avoid breaking CSV
+            }
+
+            // CSV Row
+            // Try common variations for Recipient ID
+            const rId = row.recipient_id || row.receiver_id || row.recipient || row['Receiver ID'] || row['Recipient ID'] || 'N/A';
+            csvContent += `${row.transaction_id},${row.user_id},${rId},${row.amount},${row.timestamp},${row.location},${(row.final_score || 0).toFixed(3)},Anomalous,${reason}\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "Detected_Anomalies_Only.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
     async function generateAndDownloadReport() {
         if (!currentFileId) return;
 
         const originalText = downloadReportBtn.innerHTML;
-        downloadReportBtn.innerHTML = "Generating...";
+        downloadReportBtn.innerHTML = "Compiling Intelligence…";
         downloadReportBtn.disabled = true;
 
         try {
@@ -814,6 +854,10 @@ document.addEventListener("DOMContentLoaded", function () {
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+
+            // Success Message
+            alert("Intelligence report downloaded successfully");
+
         } catch (error) {
             showError(`Report generation failed: ${error.message}`);
         } finally {
@@ -901,33 +945,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function downloadCSV() {
-        if (allResults.length === 0) return;
 
-        const headers = [
-            "transaction_id",
-            "user_id",
-            "amount",
-            "timestamp",
-            "final_score",
-            "is_anomalous",
-        ];
-        const csvContent = [
-            headers.join(","),
-            ...allResults.map((row) =>
-                headers.map((header) => row[header]).join(",")
-            ),
-        ].join("\n");
-
-        const blob = new Blob([csvContent], { type: "text/csv" });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "anomalies.csv";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }
 
     let terminalInterval;
 
@@ -936,20 +954,20 @@ document.addEventListener("DOMContentLoaded", function () {
         const textDiv = document.getElementById('terminalLoaderText');
         if (!loader || !textDiv) return;
 
-        loader.style.display = 'block';
-        analyzeBtn.disabled = true;
+        loader.style.display = 'flex'; // Use flex for centering logic in overlay
+        if (analyzeBtn) analyzeBtn.disabled = true;
 
         // Reset text
         textDiv.innerHTML = '';
 
         const steps = [
             '> INITIALIZING_CORE_SYSTEMS...',
-            '> CONNECTING_TO_SECURE_SERVER...',
-            '> UPLOADING_ENCRYPTED_DATA...',
-            '> PARSING_TRANSACTION_LOGS...',
-            '> APPLYING_HEURISTIC_MODELS...',
-            '> DETECTING_ANOMALIES...',
-            '> GENERATING_INTELLIGENCE_REPORT...'
+            '> ESTABLISHING_SECURE_UPLINK...',
+            '> DECRYPTING_TRANSACTION_LOGS...',
+            '> RUNNING_HEURISTIC_ANALYSIS...',
+            '> EXECUTING_ISOLATION_FOREST_ALGORITHM...',
+            '> SCANNING_FOR_GRAPH_ANOMALIES...',
+            '> COMPILING_THREAT_INTELLIGENCE...'
         ];
 
         let stepIndex = 0;
@@ -958,15 +976,17 @@ document.addEventListener("DOMContentLoaded", function () {
         if (terminalInterval) clearInterval(terminalInterval);
 
         // Show first step immediately
-        textDiv.innerHTML += steps[0] + '\n';
+        textDiv.innerHTML += `<div class="step">${steps[0]}</div>`;
         stepIndex++;
 
         terminalInterval = setInterval(() => {
             if (stepIndex < steps.length) {
-                textDiv.innerHTML += steps[stepIndex] + '\n';
+                textDiv.innerHTML += `<div class="step">${steps[stepIndex]}</div>`;
                 stepIndex++;
+            } else {
+                clearInterval(terminalInterval);
             }
-        }, 800); // Add a new line every 800ms
+        }, 800);
     }
 
     function hideLoader() {
@@ -1165,6 +1185,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function showBankAlert() {
         const alertBox = document.getElementById("bankAlert");
+        if (!alertBox) return;
 
         alertBox.classList.remove("hide");
         alertBox.classList.add("show");

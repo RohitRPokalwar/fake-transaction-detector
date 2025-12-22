@@ -9,7 +9,7 @@ class HybridScorer:
     Combines rule_score (40%), ml_score (50%), and graph_score (10%) with auto-tuned threshold.
     """
 
-    def __init__(self, rule_weight=0.4, ml_weight=0.5, graph_weight=0.1, threshold=None):
+    def __init__(self, rule_weight=0.5, ml_weight=0.4, graph_weight=0.1, threshold=None):
         self.rule_weight = rule_weight
         self.ml_weight = ml_weight
         self.graph_weight = graph_weight

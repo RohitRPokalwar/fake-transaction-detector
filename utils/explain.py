@@ -142,7 +142,11 @@ class Explain:
                 comparison_html = "Values are within statistical deviation ranges, but pattern is complex."
 
         # 4. Confidence Score
-        confidence = f"{ml_score * 100:.1f}" if ml_score > 0 else "N/A (Rule Only)"
+        # If a deterministic rule/graph algo triggered, we are 100% confident.
+        if all_reasons:
+            confidence = "100.0"
+        else:
+            confidence = f"{ml_score * 100:.1f}" if ml_score > 0 else "N/A (Rule Only)"
         
         # 5. Build HTML
         html = f"""

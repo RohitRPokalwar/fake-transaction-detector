@@ -863,58 +863,161 @@ tr.anomalous:hover td {
     font-style: italic;
 }
 
-/* Terminal Error Modal */
-.terminal-content {
-    background: #0a0a0a;
-    border: 1px solid #333;
-    border-radius: 6px;
-    padding: 0;
-    overflow: hidden;
-    box-shadow: 0 0 30px rgba(255, 0, 0, 0.2);
-    max-width: 600px;
-    width: 90%;
-}
-
-.terminal-header {
-    background: #1a1a1a;
-    padding: 10px 15px;
+/* --- Ultra-Premium Cyber HUD Loader --- */
+.initial-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    /* Deep void black */
     display: flex;
+    justify-content: center;
     align-items: center;
-    border-bottom: 1px solid #333;
+    z-index: 9999;
 }
 
-.terminal-dot {
-    width: 12px;
-    height: 12px;
+.cyber-hud {
+    position: relative;
+    width: 600px;
+    /* Wider HUD */
+    height: 300px;
+    display: flex;
+    flex-direction: row;
+    /* Side-by-side: Ring | Text */
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    background: radial-gradient(circle at center, rgba(0, 242, 234, 0.05), transparent 70%);
+}
+
+/* 1. The Spinning Reactor Ring */
+.cyber-spinner-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.cyber-spinner-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 3px solid transparent;
+    border-top: 3px solid var(--primary-accent);
+    border-right: 3px solid var(--primary-accent);
     border-radius: 50%;
-    margin-right: 8px;
+    animation: cyber-spin 1s linear infinite;
+    box-shadow: 0 0 20px var(--primary-accent);
 }
 
-.terminal-dot.red {
-    background: #ff5f56;
+.cyber-spinner-ring::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    border: 2px solid transparent;
+    border-bottom: 2px solid var(--secondary-accent);
+    border-left: 2px solid var(--secondary-accent);
+    border-radius: 50%;
+    animation: cyber-spin-rev 1.5s linear infinite;
 }
 
-.terminal-dot.yellow {
-    background: #ffbd2e;
+.cyber-spinner-core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: var(--primary-accent);
+    border-radius: 50%;
+    opacity: 0.2;
+    animation: cyber-pulse 1s ease-in-out infinite alternate;
 }
 
-.terminal-dot.green {
-    background: #27c93f;
+@keyframes cyber-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
-.terminal-title {
-    margin-left: 10px;
-    color: #666;
+@keyframes cyber-spin-rev {
+    0% {
+        transform: rotate(360deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes cyber-pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.6;
+        box-shadow: 0 0 30px var(--primary-accent);
+    }
+}
+
+/* 2. The Hacker Text */
+.cyber-text-container {
     font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
-}
-
-.terminal-body {
-    padding: 20px;
-    font-family: 'Courier New', monospace;
-    color: #00ff00;
-    /* Classic terminal green, but we'll override for errors */
+    color: var(--primary-accent);
+    width: 350px;
     text-align: left;
+}
+
+.cyber-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    text-shadow: 0 0 5px var(--primary-accent);
+    white-space: pre-wrap;
+    /* Preserve newlines from js */
+}
+
+.cyber-cursor {
+    display: inline-block;
+    width: 10px;
+    height: 18px;
+    background: var(--primary-accent);
+    animation: blink 0.8s steps(2, start) infinite;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+/* 3. The Scanner Line overlay */
+.cyber-scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, rgba(0, 242, 234, 0.1), transparent);
+    animation: cyber-scan 3s linear infinite;
+    pointer-events: none;
+    z-index: 10;
+}
+
+@keyframes cyber-scan {
+    0% {
+        transform: translateY(-100%);
+    }
+
+    100% {
+        transform: translateY(100%);
+    }
 }
 
 .terminal-line {
@@ -938,15 +1041,179 @@ tr.anomalous:hover td {
     }
 }
 
-.btn-terminal {
-    background: #333;
-    color: #fff;
-    border: 1px solid #555;
-    padding: 8px 16px;
+/* --- Cyber Glass Modals --- */
+.cyber-modal-content {
+    background: rgba(10, 11, 30, 0.95);
+    border: 1px solid var(--primary-accent);
+    box-shadow: 0 0 40px rgba(0, 242, 234, 0.15);
+    border-radius: 12px;
+    padding: 0;
+    width: 90%;
+    max-width: 650px;
+    overflow: hidden;
+    position: relative;
+    /* Animated Border Glow */
+    animation: modal-glow 4s infinite alternate;
+}
+
+@keyframes modal-glow {
+    0% {
+        box-shadow: 0 0 20px rgba(0, 242, 234, 0.1);
+    }
+
+    100% {
+        box-shadow: 0 0 40px rgba(0, 242, 234, 0.3);
+    }
+}
+
+.cyber-modal-content.error-mode {
+    border-color: var(--error-color);
+    animation: error-glow 2s infinite alternate;
+}
+
+@keyframes error-glow {
+    0% {
+        box-shadow: 0 0 20px rgba(255, 59, 59, 0.1);
+    }
+
+    100% {
+        box-shadow: 0 0 40px rgba(255, 59, 59, 0.3);
+    }
+}
+
+
+.cyber-modal-header {
+    background: rgba(0, 242, 234, 0.05);
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 242, 234, 0.2);
+}
+
+.cyber-modal-header h3 {
+    margin: 0;
+    color: var(--primary-accent);
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.error-mode .cyber-modal-header {
+    background: rgba(255, 59, 59, 0.05);
+    border-bottom-color: rgba(255, 59, 59, 0.2);
+}
+
+.cyber-modal-body {
+    padding: 30px;
+}
+
+/* Instructions & Lists */
+.cyber-instruction {
     font-family: 'Courier New', monospace;
-    margin: 0 0 20px 0;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+}
+
+.cyber-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.cyber-list li {
+    margin-bottom: 10px;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    padding-bottom: 5px;
+}
+
+.cyber-list li:last-child {
+    border-bottom: none;
+}
+
+.cyber-list li span {
+    color: var(--primary-accent);
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+}
+
+.cyber-list li small {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+/* Error Log */
+.cyber-error-log {
+    background: #000;
+    border: 1px solid var(--error-color);
+    padding: 15px;
+    border-radius: 6px;
+    color: #ff8888;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Buttons */
+.btn-primary-small {
+    background: transparent;
+    border: 1px solid var(--primary-accent);
+    color: var(--primary-accent);
+    padding: 8px 20px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.btn-primary-small:hover {
+    background: var(--primary-accent);
+    color: #000;
+    box-shadow: 0 0 15px var(--primary-accent);
+}
+
+.btn-error-small {
+    background: transparent;
+    border: 1px solid var(--error-color);
+    color: var(--error-color);
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.btn-error-small:hover {
+    background: var(--error-color);
+    color: #000;
+    box-shadow: 0 0 15px var(--error-color);
+}
+
+.cyber-close {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.cyber-close:hover {
+    color: #fff;
 }
 
 .btn-terminal:hover {
@@ -1195,6 +1462,57 @@ tr.anomalous:hover td {
         transform: translateY(220%);
         opacity: 0;
     }
+}
+
+/* --- Small Cyber HUD (Analysis Loader) --- */
+.cyber-loader-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    display: flex;
+    /* Centering */
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    border-radius: 16px;
+    /* Match container */
+}
+
+.cyber-hud-small {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: rgba(0, 242, 234, 0.05);
+    padding: 20px 40px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 242, 234, 0.2);
+    box-shadow: 0 0 30px rgba(0, 242, 234, 0.1);
+}
+
+.cyber-spinner-small {
+    width: 40px;
+    height: 40px;
+    border: 2px solid transparent;
+    border-top: 2px solid var(--primary-accent);
+    border-right: 2px solid var(--primary-accent);
+    border-radius: 50%;
+    animation: cyber-spin 0.8s linear infinite;
+}
+
+.cyber-text-container-small {
+    text-align: left;
+}
+
+.cyber-text-small {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: var(--primary-accent);
+    text-shadow: 0 0 5px var(--primary-accent);
+    white-space: pre-wrap;
 }
 
 .terminal-loader-text {

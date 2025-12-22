@@ -1,9 +1,15 @@
-import pandas as pd
-from datetime import datetime, timedelta
+try:
+    import pandas as pd
+    from datetime import datetime, timedelta
+except ImportError:
+    print("Error: Pandas not installed. Please run: pip install pandas")
+    print("If using a virtual environment, activate it first.")
+    exit(1)
 
 def generate_final_demo_file():
     # Base setup
-    base_time = datetime.now()
+    # Shift back 15 hours to avoid Timezone conflicts (Server UTC vs Local IST)
+    base_time = datetime.now() - timedelta(hours=15)
     rows = []
     
     # ---------------------------------------------------------
@@ -85,7 +91,7 @@ def generate_final_demo_file():
     })
     rows.append({
         "transaction_id": "TXN-2006",
-        "user_id": "User_24", # Same User
+        "user_id": "User_24",
         "recipient_id": "User_54",
         "amount": 100,
         # 1 second difference
