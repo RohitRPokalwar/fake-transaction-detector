@@ -53,6 +53,24 @@
             justify-content: center;
             align-items: center;
         }
+
+        @media (max-width: 768px) {
+            body {
+                height: auto;
+                overflow-y: auto;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+                text-align: center;
+            }
+
+            .diagram-container {
+                padding: 10px;
+                height: 500px;
+                width: 100%;
+            }
+        }
     </style>
     <script type="module">
         import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';

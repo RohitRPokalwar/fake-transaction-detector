@@ -34,6 +34,25 @@
             overflow: hidden;
         }
 
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                height: auto;
+                overflow-y: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+        }
+
         /* Sidebar Navigation */
         .sidebar {
             width: 300px;

@@ -99,29 +99,26 @@ class UAIC:
 
         # Time features
         if 'timestamp' in df.columns:
-            df_copy = df.copy()
-            df_copy['timestamp'] = pd.to_datetime(df_copy['timestamp'], errors='coerce')
-            df_copy = df_copy.dropna(subset=['timestamp'])
-
-            if len(df_copy) > 0:
-                hours = df_copy['timestamp'].dt.hour.values
-                # Sin/cos encoding for cyclical time
-                hour_sin = np.sin(2 * np.pi * hours / 24)
-                hour_cos = np.cos(2 * np.pi * hours / 24)
-                features.append(hour_sin.reshape(-1, 1))
-                features.append(hour_cos.reshape(-1, 1))
-
-                day_of_week = df_copy['timestamp'].dt.dayofweek.values
-                dow_sin = np.sin(2 * np.pi * day_of_week / 7)
-                dow_cos = np.cos(2 * np.pi * day_of_week / 7)
-                features.append(dow_sin.reshape(-1, 1))
-                features.append(dow_cos.reshape(-1, 1))
+            # Parse timestamps and fill errors with current time instead of dropping
+            timestamps = pd.to_datetime(df['timestamp'], errors='coerce')
+            # If all are NaT, then use current time for all
+            if timestamps.isna().all():
+                 timestamps = pd.Series([pd.Timestamp.now()] * len(df))
             else:
-                # Fallback if no valid timestamps
-                features.append(np.zeros((len(df), 1)))
-                features.append(np.zeros((len(df), 1)))
-                features.append(np.zeros((len(df), 1)))
-                features.append(np.zeros((len(df), 1)))
+                 timestamps = timestamps.fillna(pd.Timestamp.now())
+            
+            hours = timestamps.dt.hour.values
+            # Sin/cos encoding for cyclical time
+            hour_sin = np.sin(2 * np.pi * hours / 24)
+            hour_cos = np.cos(2 * np.pi * hours / 24)
+            features.append(hour_sin.reshape(-1, 1))
+            features.append(hour_cos.reshape(-1, 1))
+
+            day_of_week = timestamps.dt.dayofweek.values
+            dow_sin = np.sin(2 * np.pi * day_of_week / 7)
+            dow_cos = np.cos(2 * np.pi * day_of_week / 7)
+            features.append(dow_sin.reshape(-1, 1))
+            features.append(dow_cos.reshape(-1, 1))
 
         # User activity features
         if 'user_id' in df.columns:

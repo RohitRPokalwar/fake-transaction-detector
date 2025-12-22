@@ -675,12 +675,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Add click handler for modal (Transaction Details)
             tr.addEventListener("click", (e) => {
-                // If clicked on User ID, show profile instead
-                if (e.target.cellIndex === 1) {
+                const colIndex = e.target.cellIndex;
+
+                if (colIndex === 1) {
+                    // Click User ID -> Show User Dossier
                     e.stopPropagation();
                     showUserProfile(row.user_id);
+                } else if (colIndex === 4) {
+                    // Click Final Score -> Show Score Decomp
+                    showTransactionDetails(row, true);
+                } else if (colIndex === 5) {
+                    // Click Status -> Show Why (Auto-trigger Agent)
+                    showTransactionDetails(row, false);
+                    setTimeout(() => {
+                        const agentBtn = document.getElementById("askAgentBtn");
+                        if (agentBtn) agentBtn.click();
+                    }, 300);
                 } else {
-                    showTransactionDetails(row);
+                    // Click elsewhere -> Show general details
+                    showTransactionDetails(row, false);
                 }
             });
             tbody.appendChild(tr);
@@ -866,12 +879,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function showTransactionDetails(row) {
+    function showTransactionDetails(row, showBreakdown = false) {
         const finalScore =
             typeof row.final_score === "number" ? row.final_score.toFixed(3) : "N/A";
 
+        const modalTitle = document.querySelector("#detailsModal h2");
+        if (modalTitle) {
+            modalTitle.innerText = showBreakdown ? "🛡️ Algorithm Transparency Report" : "🔍 Transaction Intelligence Dossier";
+        }
+
         modalBody.innerHTML = `
-      <div class="detail-grid">
+      <div id="fullDossierGrid" class="detail-grid" style="display: ${showBreakdown ? 'none' : 'grid'}">
         <div class="detail-item">
           <label>Transaction ID</label>
           <span>${row.transaction_id || "N/A"}</span>
@@ -901,9 +919,42 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>
 
       <div class="agent-section">
-        <button id="askAgentBtn" class="btn-agent">
-          <span class="icon">🤖</span> ASK AGENT: WHY?
-        </button>
+        <div class="breakdown-header" style="display: ${showBreakdown ? 'block' : 'none'}">📊 SCORING DECOMPOSITION (INTERNAL BREAKDOWN)</div>
+        <div id="scoreDetails" class="score-details-container" style="display: ${showBreakdown ? 'block' : 'none'}">
+          ${row.details ? `
+            <div class="score-row">
+              <span class="score-label">Rule Engine Risk:</span>
+              <span class="score-value">${(row.details.rule_score * 100).toFixed(0)}%</span>
+              <span class="score-weight">(Weight: ${row.details.weights.rule})</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">AI Behavioral Risk:</span>
+              <span class="score-value">${(row.details.ml_score * 100).toFixed(0)}%</span>
+              <span class="score-weight">(Weight: ${row.details.weights.ml})</span>
+            </div>
+            <div class="score-row">
+              <span class="score-label">Graph Structural Risk:</span>
+              <span class="score-value">${(row.details.graph_score * 100).toFixed(0)}%</span>
+              <span class="score-weight">(Weight: ${row.details.weights.graph})</span>
+            </div>
+            <div class="score-divider"></div>
+            <div class="score-row total">
+              <span class="score-label">Calculated Final Intensity:</span>
+              <span class="score-value">${(row.final_score * 100).toFixed(1)}%</span>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.75rem; color: #888; font-style: italic;">
+              * The final score is a weighted combination of deterministic rules, ML behavior models, and graph structural analysis.
+            </p>
+          ` : '<p style="color: #666; font-size: 0.8rem;">Historical data: Calculation weights not captured.</p>'}
+        </div>
+        
+        <div class="modal-action-buttons" style="display: flex; gap: 10px;">
+            ${showBreakdown ? `<button id="btnShowDossier" class="btn-secondary" style="flex: 1;">VIEW TRANSACTION DOSSIER</button>` : ''}
+            <button id="askAgentBtn" class="btn-agent" style="flex: ${showBreakdown ? '2' : '1'};">
+              <span class="icon">🤖</span> AI INVESTIGATOR: EXPLAIN WHY
+            </button>
+        </div>
+
         <div id="agentResponse" class="agent-response" style="display: none;">
           <div class="typing-indicator">
             <span></span><span></span><span></span>
@@ -915,17 +966,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
         detailsModal.style.display = "flex";
 
-        // Add event listener for the button
-        const btn = document.getElementById("askAgentBtn");
+        // Listeners for new buttons
+        const btnDossier = document.getElementById("btnShowDossier");
+        if (btnDossier) {
+            btnDossier.addEventListener("click", () => showTransactionDetails(row, false));
+        }
+
+        const btnAgent = document.getElementById("askAgentBtn");
         const responseDiv = document.getElementById("agentResponse");
         const typingDiv = responseDiv.querySelector(".typing-indicator");
         const textDiv = responseDiv.querySelector(".response-text");
 
-        btn.addEventListener("click", () => {
-            btn.disabled = true;
+        btnAgent.addEventListener("click", () => {
+            btnAgent.disabled = true;
             responseDiv.style.display = "block";
-
-            // Simulate thinking/typing delay
             setTimeout(() => {
                 typingDiv.style.display = "none";
                 textDiv.innerHTML = `<strong>Agent Analysis:</strong><br>${row.explanation || "No explanation provided."}`;
@@ -933,6 +987,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }, 1000);
         });
     }
+
 
     function destroyCharts() {
         if (scoreChart && typeof scoreChart.destroy === "function") {

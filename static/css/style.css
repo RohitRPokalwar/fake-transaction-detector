@@ -1778,3 +1778,269 @@ tr.anomalous:hover td {
         opacity: 0;
     }
 }
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media (max-width: 1024px) {
+    .charts {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2.5rem;
+    }
+
+    .container {
+        padding: 20px 10px;
+    }
+
+    .upload-section,
+    .results {
+        padding: 20px;
+    }
+
+    .upload-area {
+        padding: 40px 20px;
+    }
+
+    .summary-card span {
+        font-size: 2rem;
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 15px;
+    }
+
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-content h2 {
+        font-size: 1.5rem;
+        padding: 20px 20px 0;
+    }
+
+    .agent-section {
+        padding: 20px;
+    }
+
+    .btn-primary {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 2rem;
+        letter-spacing: -1px;
+    }
+
+    .summary {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .chart-container {
+        min-height: 300px;
+    }
+
+    .btn-secondary-outline {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    .detail-item span {
+        font-size: 1.1rem;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 20px;
+    }
+
+    /* Loader Responsiveness */
+    .cyber-hud {
+        width: 90%;
+        height: auto;
+        flex-direction: column;
+        gap: 20px;
+        padding: 40px 20px;
+    }
+
+    .cyber-text-container {
+        text-align: center;
+        width: 100%;
+    }
+
+    .cyber-text {
+        font-size: 1.1rem;
+        min-height: 3rem;
+    }
+
+    .cyber-hud-small {
+        flex-direction: column;
+        padding: 20px;
+        text-align: center;
+        width: 80%;
+    }
+
+    .cyber-text-container-small {
+        text-align: center;
+    }
+}
+
+/* Scoring Decomposition Styles */
+.breakdown-header {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.8rem;
+    color: var(--secondary-accent);
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.score-details-container {
+    background: rgba(112, 0, 255, 0.03);
+    border: 1px solid rgba(112, 0, 255, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.score-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px;
+}
+
+.score-row.total {
+    margin-top: 15px;
+    margin-bottom: 0;
+}
+
+.score-label {
+    flex: 1;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.score-value {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    min-width: 50px;
+    text-align: right;
+}
+
+.score-weight {
+    color: #666;
+    font-size: 0.75rem;
+    font-family: monospace;
+    min-width: 90px;
+}
+
+.score-divider {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(112, 0, 255, 0.2), transparent);
+    margin: 15px 0;
+}
+
+.score-row.total .score-label {
+    color: #fff;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.score-row.total .score-value {
+    color: var(--primary-accent);
+    font-size: 1.3rem;
+    text-shadow: 0 0 15px rgba(0, 242, 234, 0.3);
+}
+
+@media (max-width: 480px) {
+    .score-row {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .score-weight {
+        width: 100%;
+        text-align: right;
+    }
+}
+
+/* Investigative Discovery Guide Legend */
+.investigative-guide {
+    display: flex;
+    gap: 30px;
+    margin: 10px 0 25px 0;
+    padding: 15px 25px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    flex-wrap: wrap;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.guide-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.guide-tag {
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'Outfit', sans-serif;
+}
+
+.guide-tag.user {
+    background: rgba(0, 242, 234, 0.1);
+    color: var(--primary-accent);
+    border: 1px solid rgba(0, 242, 234, 0.3);
+}
+
+.guide-tag.score {
+    background: rgba(112, 0, 255, 0.1);
+    color: var(--secondary-accent);
+    border: 1px solid rgba(112, 0, 255, 0.3);
+}
+
+.guide-tag.status {
+    background: rgba(255, 59, 59, 0.1);
+    color: var(--error-color);
+    border: 1px solid rgba(255, 59, 59, 0.3);
+}
+
+.guide-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.guide-text b {
+    color: #fff;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .investigative-guide {
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .guide-item {
+        width: 100%;
+    }
+}

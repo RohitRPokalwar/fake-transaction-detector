@@ -1,4 +1,4 @@
-txn,user_id,reci_id,amount,timestamp,location
+transaction_id,user_id,recipient_id,amount,timestamp,location
 TXN-2001,User_20,User_50,5000,2025-12-22 03:00:00,Delhi
 TXN-2001,User_20,User_50,5000,2025-12-22 03:00:00,Delhi
 TXN-2002,User_21,User_51,2500,2035-01-01 12:00:00,Pune

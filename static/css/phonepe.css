@@ -297,3 +297,36 @@ input:focus {
         transform: rotate(360deg);
     }
 }
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media (max-height: 700px) {
+    body {
+        align-items: flex-start;
+        padding: 20px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-container {
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
+    }
+
+    .amount-input-group input {
+        font-size: 2rem;
+    }
+
+    .form-group {
+        padding: 10px 20px;
+    }
+
+    .result-card {
+        margin: 15px 20px;
+        padding: 15px;
+    }
+
+    .score-display {
+        font-size: 1.5rem;
+    }
+}

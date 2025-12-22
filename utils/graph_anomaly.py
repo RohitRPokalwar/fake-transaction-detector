@@ -28,8 +28,8 @@ class GraphAnomalyDetector:
 
         # Identify columns (assume 'sender', 'receiver', 'amount' or fallback to first three columns)
         # Identify columns (Smart detection)
-        possible_senders = ['sender', 'source', 'user_id', 'origin_account']
-        possible_receivers = ['receiver', 'recipient', 'target', 'recipient_id', 'destination_account']
+        possible_senders = ['user_id', 'sender', 'source', 'origin_account']
+        possible_receivers = ['recipient_id', 'receiver', 'recipient', 'target', 'destination_account']
         
         sender_col = next((c for c in possible_senders if c in df.columns), df.columns[0])
         # If receiver column not found, try to find a column that isn't sender, amount, tx_id, time
@@ -56,11 +56,11 @@ class GraphAnomalyDetector:
         self.edge_amounts = defaultdict(float)
 
         for _, row in df.iterrows():
-            sender = row[sender_col]
-            receiver = row[receiver_col]
+            sender = str(row[sender_col]).strip().lower() # Case-insensitive demo
+            receiver = str(row[receiver_col]).strip().lower()
             amount = float(row[amount_col]) if amount_col and pd.notna(row[amount_col]) else 1.0
 
-            if pd.notna(sender) and pd.notna(receiver):
+            if sender and receiver:
                 edge_counts[(sender, receiver)] += 1
                 self.edge_amounts[(sender, receiver)] += amount
 
@@ -111,6 +111,10 @@ class GraphAnomalyDetector:
         Compute anomaly score for a single transaction.
         Returns: (score, reasons_list)
         """
+        # Ensure case-insensitive matching
+        sender = str(sender).strip().lower()
+        receiver = str(receiver).strip().lower()
+        
         score = 0.0
         reasons = []
 
@@ -181,11 +185,11 @@ class GraphAnomalyDetector:
                         min_amt = min(cycle_amounts)
                         max_amt = max(cycle_amounts)
                         
-                        # If amounts are roughly consistent (min is at least 50% of max)
+                        # If amounts are roughly consistent (min is at least 30% of max)
                         # This catches 50k -> 49k -> 48k (ratio ~0.96)
-                        # But ignores 40k -> 100 -> 40k (ratio ~0.002) - i.e. buying coffee inside a loop
+                        # And also more varied demo loops like 100 -> 90 -> 40 (ratio 0.4)
                         
-                        if min_amt > 0 and (min_amt / max_amt) > 0.5:
+                        if min_amt > 0 and (min_amt / max_amt) > 0.3:
                             # Create descriptive string: A -> B -> C -> A
                             avg_amt = sum(cycle_amounts) / len(cycle_amounts)
                             cycle_str = " -> ".join(str(n) for n in cycle) + " -> " + str(cycle[0])
@@ -202,8 +206,8 @@ class GraphAnomalyDetector:
 
         # Identify columns
         # Identify columns (Smart detection - ensure consistency with _build_graph)
-        possible_senders = ['sender', 'source', 'user_id', 'origin_account']
-        possible_receivers = ['receiver', 'recipient', 'target', 'recipient_id', 'destination_account']
+        possible_senders = ['user_id', 'sender', 'source', 'origin_account']
+        possible_receivers = ['recipient_id', 'receiver', 'recipient', 'target', 'destination_account']
         
         sender_col = next((c for c in possible_senders if c in df.columns), df.columns[0])
         receiver_col = next((c for c in possible_receivers if c in df.columns), None)
@@ -236,13 +240,8 @@ class GraphAnomalyDetector:
             scores.append(score)
             all_reasons.append(reasons)
 
-        # Normalize scores to 0-1 range
-        if scores:
-            min_score = min(scores)
-            max_score = max(scores)
-            if max_score > min_score:
-                scores = [(s - min_score) / (max_score - min_score) for s in scores]
-            else:
-                scores = [0.5] * len(scores)  # All same, set to 0.5
+        # REMOVED: Normalization step as it distorts absolute scores 
+        # (e.g., a single cycle score of 0.9 would be normalized down to 0.5)
+        # The scores are already bounded 0-1 by _compute_anomaly_score.
                 
         return scores, all_reasons

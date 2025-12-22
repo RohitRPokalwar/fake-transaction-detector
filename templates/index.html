@@ -55,13 +55,12 @@
                     <input type="file" id="fileInput" accept=".csv" hidden>
                 </div>
             </div>
-            <div
-                style="text-align: center; margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
+            <div style="text-align: center; margin-top: 20px;">
                 <button id="analyzeBtn" class="btn-primary" disabled>Analyze Transactions</button>
                 <button id="requirementsBtn" class="btn-secondary-outline">CSV Requirements</button>
-                <a href="/live" class="btn-secondary-outline">🚀 LIVE ANALYZER</a>
-                <a href="/presentation" class="btn-secondary-outline">📊 PRESENTATION</a>
-                <a href="/simple-guide" class="btn-secondary-outline">📖 SIMPLE GUIDE</a>
+                <a href="/live" class="btn-secondary-outline">
+                    🚀 LAUNCH LIVE ANALYZER
+                </a>
             </div>
 
             <div id="terminalLoader" class="cyber-loader-overlay" style="display: none;">
@@ -138,10 +137,26 @@
             <div class="table-section">
                 <h3>Transaction Details</h3>
                 <div class="action-buttons">
-                    <button id="downloadBtn" class="btn-secondary">Download Anomalies CSV</button>
-                    <button id="downloadReportBtn" class="btn-secondary">📄 Download Intelligence
-                        Briefing</button>
+                    <button id="downloadBtn" class="btn-secondary">EXPORT ANOMALY LOGS (CSV)</button>
+                    <button id="downloadReportBtn" class="btn-secondary">COMPILE INTELLIGENCE DOSSIER (PDF)</button>
                 </div>
+
+                <!-- NEW: Investigative Discovery Legend -->
+                <div class="investigative-guide">
+                    <div class="guide-item">
+                        <span class="guide-tag user">USER ID</span>
+                        <span class="guide-text">Click to view <b>Profile History & Risk Stats</b></span>
+                    </div>
+                    <div class="guide-item">
+                        <span class="guide-tag score">FINAL SCORE</span>
+                        <span class="guide-text">Click for <b>Algorithm Math & Weights</b></span>
+                    </div>
+                    <div class="guide-item">
+                        <span class="guide-tag status">STATUS</span>
+                        <span class="guide-text">Click for <b>AI Investigator (Why?)</b></span>
+                    </div>
+                </div>
+
                 <div class="table-container">
                     <table id="resultsTable">
                         <thead>
@@ -239,7 +254,7 @@
                 <div class="bank-icon">🏦</div>
                 <div class="bank-text">
                     <strong>Suspicious Transaction Blocked</strong>
-                    <p>Unauthorized activity detected. Your card has been temporarily frozen.</p>
+                    <p>Unauthorized activity detected.</p>
                     <div class="ai-tag">Detected by AI Anomaly Detection Engine</div>
                 </div>
             </div>
