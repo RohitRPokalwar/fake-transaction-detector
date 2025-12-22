@@ -241,19 +241,21 @@
         <!-- Modal Removed: Replaced by Live Analyzer Page -->
 
         <!-- Fake Bank Alert Overlay (Fixed Position) -->
-        <div id="bankAlert" class="bank-alert" style="display: none;">
+        <div id="bankAlert" class="bank-alert">
             <div class="bank-alert-header">
                 <span>⚠️ SECURITY ALERT</span>
-                <span style="font-size: 0.8rem;">JUST NOW</span>
+                <span class="alert-time">JUST NOW</span>
             </div>
             <div class="bank-alert-body">
                 <div class="bank-icon">🏦</div>
                 <div class="bank-text">
-                    <strong>FAKE Transaction BLOCKED</strong>
-                    <p>Unauthorized transaction detected. Card frozen.</p>
+                    <strong>Suspicious Transaction Blocked</strong>
+                    <p>Unauthorized activity detected. Your card has been temporarily frozen.</p>
+                    <div class="ai-tag">Detected by AI Anomaly Detection Engine</div>
                 </div>
             </div>
         </div>
+
 
         <!-- Global Flash Overlay -->
         <div id="flashOverlay"

@@ -50,33 +50,41 @@ document.addEventListener("DOMContentLoaded", function () {
     runInitialLoader();
 
     function runInitialLoader() {
+        const initialLoader = document.getElementById('initialLoader');
         const textDiv = document.getElementById('bootText');
+
         if (!initialLoader || !textDiv) {
             if (initialLoader) initialLoader.style.display = 'none';
             return;
         }
 
         const steps = [
-            '> Initializing Fake Founder Detection Engine...',
-            '> Loading Behavioral Models...',
-            '> Deploying Anomaly Scanner...',
+            '> Initializing Fake Transaction Detection Engine...',
+            '> Loading Transaction Behavior Models...',
+            '> Deploying Anomaly Detection Pipeline...',
             '> SYSTEM READY.'
         ];
 
         let stepIndex = 0;
 
-        // Type first line immediately
-        textDiv.innerHTML += steps[0] + '\n';
+        // Clear previous text (important if re-run)
+        textDiv.textContent = '';
+
+        // Print first line immediately
+        textDiv.textContent += steps[stepIndex] + '\n';
         stepIndex++;
 
         const interval = setInterval(() => {
             if (stepIndex < steps.length) {
-                textDiv.innerHTML += steps[stepIndex] + '\n';
+                textDiv.textContent += steps[stepIndex] + '\n';
                 stepIndex++;
             } else {
                 clearInterval(interval);
+
                 setTimeout(() => {
                     initialLoader.style.opacity = '0';
+                    initialLoader.style.transition = 'opacity 0.5s ease';
+
                     setTimeout(() => {
                         initialLoader.style.display = 'none';
                     }, 500);
@@ -84,6 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }, 1000);
     }
+
 
     function setupEventListeners() {
         // File upload handling
@@ -1155,13 +1164,22 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function showBankAlert() {
-        const alertEl = document.getElementById('bankAlert');
-        if (alertEl) {
-            alertEl.style.display = 'block';
-            // Hide after 5 seconds
-            setTimeout(() => {
-                alertEl.style.display = 'none';
-            }, 5000);
-        }
+        const alertBox = document.getElementById("bankAlert");
+
+        alertBox.classList.remove("hide");
+        alertBox.classList.add("show");
+
+        // Auto-hide after 6 seconds
+        setTimeout(() => {
+            alertBox.classList.remove("show");
+            alertBox.classList.add("hide");
+        }, 5500);
+
+        // Fully remove after animation
+        setTimeout(() => {
+            alertBox.style.display = "none";
+            alertBox.classList.remove("hide");
+        }, 6000);
     }
+
 });

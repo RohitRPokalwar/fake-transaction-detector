@@ -1370,3 +1370,93 @@ tr.anomalous:hover td {
     border-color: #fff;
     color: #fff;
 }
+
+.bank-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 360px;
+    background: #121a2f;
+    border-left: 6px solid #ff3b3b;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    display: none;
+    z-index: 9999;
+}
+
+/* HEADER */
+.bank-alert-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: #1b2540;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.bank-alert-header span:last-child {
+    font-size: 0.75rem;
+    color: #aaa;
+}
+
+/* BODY */
+.bank-alert-body {
+    display: flex;
+    padding: 14px;
+    gap: 12px;
+}
+
+.bank-icon {
+    font-size: 2.2rem;
+}
+
+.bank-text strong {
+    display: block;
+    font-size: 1.05rem;
+    color: #ff4d4d;
+    margin-bottom: 6px;
+}
+
+.bank-text p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #d0d4ff;
+    line-height: 1.4;
+}
+
+.ai-tag {
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: #8ab4ff;
+}
+
+/* ANIMATIONS */
+.bank-alert.show {
+    display: block;
+    animation: slideIn 0.4s ease-out;
+}
+
+.bank-alert.hide {
+    animation: fadeOut 0.4s ease-in forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+}
