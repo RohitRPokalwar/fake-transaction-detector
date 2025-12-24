@@ -292,10 +292,10 @@
 
                 <h3>Detailed Logic</h3>
                 <pre><code>Rules = [
-  "Future Transaction" (Date > Now + 24h),
-  "Negative Amount" (Amt < 0),
-  "Burst Velocity" (Time_Diff < 2s),
-  "Impossible Travel" (Loc_Diff > 500km in < 1h)
+  "Time Travel" (Date > Now),
+  "Ghost Money" (Amt <= 0),
+  "High Velocity (Burst)" (Within 2s),
+  "Teleportation Alert" (Physically Impossible)
 ]</code></pre>
                 <p><strong>Line-by-Line Logic:</strong> The code iterates through the Pandas DataFrame. For each rule,
                     it creates a boolean mask. If <code>row['amount'] < 0</code>, it flags immediately with 100%
@@ -318,13 +318,20 @@
                 <p><strong>UAIC:</strong> Unsupervised Anomaly Isolation Core.<br>Uses <strong>Isolation
                         Forest</strong>.</p>
 
-                <h3>Explaining the "Why"</h3>
-                <p>Supervised learning (Logistic Regression / Random Forest) requires <em>labeled data</em> (Fraud vs
-                    Not Fraud). Most companies don't have thousands of confirmed fraud cases. <br>
-                    <strong>Isolation Forest</strong> is <em>Unsupervised</em>. It assumes anomalies are "few and
-                    different". It randomly cuts the data points. Anomalies are "isolated" quickly (fewer cuts); normal
-                    points take longer to isolate.
-                </p>
+                <h3>Explaining the "Why" (The Easy Way)</h3>
+                <p>Think of <strong>Isolation Forest</strong> like playing a <strong>Guessing Game</strong>.</p>
+                <div class="explainer-box">
+                    <strong>The Logic:</strong>
+                    <br>1. Imagine a room full of 1,000 people who are all 5 feet tall, and 1 giant who is 10 feet tall.
+                    <br>2. To find a "Normal" person, you have to ask many questions: "Are they 5'1? 5'2? 4'9?" It's
+                    hard to separate them because they all look the same.
+                    <br>3. To find the "Anomalous" giant, you only need ONE question: <i>"Is anyone over 8 feet?"</i>
+                    <strong>BOOM.</strong> You isolated them instantly.
+                </div>
+                <p>In our code, normal transactions (₹50, ₹100) are all grouped together. Illegal transactions (₹5
+                    Lakhs, 3 AM transfers) are "different" and "lonely." The AI "cuts" the data until it finds these
+                    lonely points. Since illegal points are so different, the AI finds them with very few cuts—making
+                    them easy to catch.</p>
 
                 <h3>Feature Engineering Logic</h3>
                 <pre><code># Time is cyclical!
@@ -394,14 +401,16 @@ df['hour_cos'] = np.cos(2 * np.pi * df['hour']/24)</code></pre>
                 <p>This module translates Math -> English.</p>
                 <p>It checks <em>which</em> component triggered the flag.</p>
                 <ul>
-                    <li>If <code>Rule_Burst == True</code> -> return "High Velocity Transaction Detected"</li>
-                    <li>If <code>ML_Score > 0.8</code> -> Check SHAP values. "Amount is $50,000 (Normal: $500)"</li>
-                    <li>If <code>Graph_Loop == True</code> -> "Circular Transaction Logic Detected"</li>
+                    <li>If <code>Rule_Burst == True</code> -> return "High Velocity (Burst): Transaction made within 2
+                        seconds"</li>
+                    <li>If <code>ML_Score > 0.8</code> -> Check AI reasons. "Amount is ₹50,000 (Usual: ₹500)"</li>
+                    <li>If <code>Graph_Loop == True</code> -> "Money Circle: Circular Transaction Detected"</li>
                 </ul>
                 <div class="qa-box">
                     <div class="qa-title">❓ Judge Q: Why is Explainability important?</div>
                     <div class="qa-answer">
-                        "We provide <strong>'Human Reasons'</strong> for every flag (e.g., 'Burst Triggered'). This
+                        "We provide <strong>'Human Reasons'</strong> for every flag (e.g., 'High Velocity (Burst):
+                        Transaction made within 2 seconds'). This
                         builds trust and ensures analysts can audit the AI's decision instead of blindly following a
                         black box."
                     </div>

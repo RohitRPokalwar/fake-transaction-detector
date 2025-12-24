@@ -28,7 +28,7 @@ This section is designed to be **Performed**, not just read. Use drama and pause
 3.  **Result:**
     *   First one might create the baseline or pass.
     *   **Second one:** 🔴 **SUSPICIOUS**
-4.  **Narrator:** *"Did you see that? The second transaction was blocked. Why? Because it happened 300ms after the first. High Velocity Burst detected. The bot is stopped."*
+4.  **Narrator:** *"Did you see that? The second transaction was blocked. Why? Because it happened within 2 seconds of the first. High Velocity (Burst): Transaction made within 2 seconds. The bot is stopped."*
 
 ---
 

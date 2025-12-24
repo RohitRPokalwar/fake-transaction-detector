@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fake Transaction Detector</title>
+    <title>VIGILO // Fake Transaction Detector</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -38,8 +38,8 @@
     </div>
     <div class="container">
         <header>
-            <h1>🔍 Fake Transaction Detector</h1>
-            <p>Hybrid Rule-Based and AIML System for Anomaly Detection</p>
+            <h1>VIGILO</h1>
+            <p>Fake Transaction Detector // Hybrid AI Intelligence</p>
         </header>
 
         <div class="upload-section">
@@ -178,21 +178,23 @@
         <!-- Modal for row details -->
         <div id="detailsModal" class="modal" style="display: none;">
             <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>Transaction Details</h2>
-                <div id="modalBody"></div>
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <h2>Transaction Details</h2>
+                </div>
+                <div id="modalBody" class="modal-inner-body"></div>
             </div>
         </div>
 
         <!-- Modal for User Profile -->
         <div id="userProfileModal" class="modal" style="display: none;">
             <div class="modal-content user-profile-content">
-                <span class="close-profile">&times;</span>
                 <div class="profile-header">
+                    <span class="close-profile">&times;</span>
                     <h2>🕵️ User Dossier</h2>
                     <div id="userRiskBadge" class="risk-badge"></div>
                 </div>
-                <div id="userProfileBody"></div>
+                <div id="userProfileBody" class="modal-inner-body"></div>
             </div>
         </div>
 
@@ -245,7 +247,7 @@
         <!-- Modal Removed: Replaced by Live Analyzer Page -->
 
         <!-- Fake Bank Alert Overlay (Fixed Position) -->
-        <div id="bankAlert" class="bank-alert">
+        <!-- <div id="bankAlert" class="bank-alert">
             <div class="bank-alert-header">
                 <span>⚠️ SECURITY ALERT</span>
                 <span class="alert-time">JUST NOW</span>
@@ -258,7 +260,7 @@
                     <div class="ai-tag">Detected by AI Anomaly Detection Engine</div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
 
         <!-- Global Flash Overlay -->

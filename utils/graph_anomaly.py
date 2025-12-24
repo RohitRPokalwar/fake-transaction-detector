@@ -17,6 +17,7 @@ class GraphAnomalyDetector:
         self.edge_weights = {}
         self.communities = {}
         self.edge_to_cycle_map = {}
+        self.edge_to_nodes_map = {}
 
     def _build_graph(self, df):
         """
@@ -126,54 +127,44 @@ class GraphAnomalyDetector:
         receiver_comm = self.communities.get(receiver, -1)
         if sender_comm != receiver_comm:
             score += 0.3  # Cross-community transaction penalty
-            reasons.append("Cross-Community Transaction (Unusual Group Interaction)")
+            reasons.append("Unrelated Network Transfer")
 
         # Cycle Detection Check
         if (sender, receiver) in self.edge_to_cycle_map:
             score += 0.9
             cycle_desc = self.edge_to_cycle_map[(sender, receiver)]
-            reasons.append(f"Money Laundering Loop Detected: {cycle_desc}")
+            reasons.append("Circular Money Loop Detected")
 
         return min(score, 1.0), reasons
 
     def detect_anomalies(self, df):
         """
         Detect anomalies in transaction data using graph-based methods.
-
-        Args:
-            df (pd.DataFrame): Transaction data
-
-        Returns:
-            tuple: (scores_list, reasons_list_of_lists)
+        Returns: (scores_list, reasons_list_of_lists, node_paths_list)
         """
         if df.empty:
-            return [], []
+            return [], [], []
 
         # Build graph
         self._build_graph(df)
-
-        # Compute centrality
         self._compute_centrality()
-
-        # Detect communities
         self._detect_communities()
 
         # DETECT CYCLES (Money Laundering Loops)
         self.edge_to_cycle_map = {}
+        self.edge_to_nodes_map = {} 
         try:
             # Only run on reasonable size graphs to avoid hanging
-            if self.graph.number_of_nodes() < 1000:
-                # nx.simple_cycles is expensive, but powerful for finding laundering rings
-                cycles = nx.simple_cycles(self.graph)
+            if self.graph.number_of_nodes() < 2000:
+                # nx.simple_cycles is an iterator - do NOT use list() on it for large graphs
+                cycles_iter = nx.simple_cycles(self.graph)
                 limit = 0
-                for cycle in cycles:
+                for cycle in cycles_iter:
                     limit += 1
-                    if limit > 10000: break # Increased limit
+                    if limit > 5000: break # Early exit for performance
 
-                    if 2 <= len(cycle) <= 6: # Filter for tight laundering loops
-                        # Check amounts consistency to ensure it's a "Money Pass-Through"
+                    if 2 <= len(cycle) <= 6: 
                         cycle_amounts = []
-                        valid_cycle = True
                         for i in range(len(cycle)):
                             u = cycle[i]
                             v = cycle[(i + 1) % len(cycle)]
@@ -181,31 +172,23 @@ class GraphAnomalyDetector:
                             cycle_amounts.append(amt)
                         
                         if not cycle_amounts: continue
-
                         min_amt = min(cycle_amounts)
                         max_amt = max(cycle_amounts)
                         
-                        # If amounts are roughly consistent (min is at least 30% of max)
-                        # This catches 50k -> 49k -> 48k (ratio ~0.96)
-                        # And also more varied demo loops like 100 -> 90 -> 40 (ratio 0.4)
-                        
                         if min_amt > 0 and (min_amt / max_amt) > 0.3:
-                            # Create descriptive string: A -> B -> C -> A
                             avg_amt = sum(cycle_amounts) / len(cycle_amounts)
                             cycle_str = " -> ".join(str(n) for n in cycle) + " -> " + str(cycle[0])
-                            # Add amount context
                             cycle_str += f" (Avg Amount: {int(avg_amt)})"
                             
-                            # Map each edge in the cycle to this description
                             for i in range(len(cycle)):
                                 u = cycle[i]
-                                v = cycle[(i + 1) % len(cycle)] # wrap around to first node
+                                v = cycle[(i + 1) % len(cycle)]
                                 self.edge_to_cycle_map[(u, v)] = cycle_str
+                                self.edge_to_nodes_map[(u, v)] = [str(n) for n in cycle]
         except Exception:
-            pass # Fail gracefully if graph algo fails
+            pass
 
         # Identify columns
-        # Identify columns (Smart detection - ensure consistency with _build_graph)
         possible_senders = ['user_id', 'sender', 'source', 'origin_account']
         possible_receivers = ['recipient_id', 'receiver', 'recipient', 'target', 'destination_account']
         
@@ -213,35 +196,30 @@ class GraphAnomalyDetector:
         receiver_col = next((c for c in possible_receivers if c in df.columns), None)
         
         if receiver_col is None:
-             if len(df.columns) > 1 and df.columns[1] != sender_col:
-                 receiver_col = df.columns[1]
-             elif len(df.columns) > 2:
-                 receiver_col = df.columns[2]
-             else:
-                 receiver_col = df.columns[-1]
+             receiver_col = df.columns[1] if len(df.columns) > 1 else df.columns[-1]
 
         amount_col = 'amount' if 'amount' in df.columns else (df.columns[2] if len(df.columns) > 2 else None)
 
-        # Compute scores for each transaction
         scores = []
         all_reasons = []
+        node_paths = []
         
         for _, row in df.iterrows():
-            sender = row[sender_col]
-            receiver = row[receiver_col]
+            sender = str(row[sender_col]).strip().lower()
+            receiver = str(row[receiver_col]).strip().lower()
             amount = float(row[amount_col]) if amount_col and pd.notna(row[amount_col]) else 1.0
 
             if pd.notna(sender) and pd.notna(receiver):
                 score, reasons = self._compute_anomaly_score(sender, receiver, amount)
+                # Pull raw cycle nodes for the WOW feature
+                nodes = self.edge_to_nodes_map.get((sender, receiver))
+                node_paths.append(nodes)
             else:
                 score = 0.5 
                 reasons = ["Incomplete transaction data"]
+                node_paths.append(None)
 
             scores.append(score)
             all_reasons.append(reasons)
-
-        # REMOVED: Normalization step as it distorts absolute scores 
-        # (e.g., a single cycle score of 0.9 would be normalized down to 0.5)
-        # The scores are already bounded 0-1 by _compute_anomaly_score.
                 
-        return scores, all_reasons
+        return scores, all_reasons, node_paths

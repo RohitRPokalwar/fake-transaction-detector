@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Analyzer // Payment Shield</title>
+    <title>VIGILO // Live Analyzer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/phonepe.css') }}">
     <!-- Load Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -16,8 +16,8 @@
         <!-- Header -->
         <div class="header">
             <a href="/" class="back-btn">&larr;</a>
-            <h1>LIVE ANALYZER</h1>
-            <div class="subtitle">Secure Transaction Gateway</div>
+            <h1>VIGILO LIVE</h1>
+            <div class="subtitle">Secure AI Transaction Gateway</div>
         </div>
 
         <div style="padding: 20px;">
@@ -49,7 +49,7 @@
 
             <div class="form-group">
                 <label>Location</label>
-                <input type="text" id="txnLocation" value="New York, US">
+                <input type="text" id="txnLocation" value="Delhi, IN">
             </div>
 
             <div class="form-group">
@@ -79,6 +79,12 @@
             <div id="narrativeText" class="explanation-text">
                 No anomalies detected. Transaction fits normal patterns.
             </div>
+
+            <!-- New Network Loop Viz inside Result Card -->
+            <div id="cycleVizResult" class="cycle-viz"
+                style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; display:none;">
+                <!-- nodes injected by JS -->
+            </div>
         </div>
 
         <button id="techToggle" class="tech-details-btn" onclick="toggleTechDetails()" style="display: none;">[ VIEW
@@ -91,6 +97,91 @@
             <div class="spinner"></div>
         </div>
 
+        <!-- JUDGE MODE QUICK SCENARIOS -->
+        <div class="judge-scenarios">
+            <h3><span>JUDGE MODE: SCENARIOS</span> <span id="contextStatus">● System Ready</span></h3>
+            <div class="scenario-buttons">
+                <button class="scenario-btn" onclick="loadScenario('teleport', event)">
+                    <strong>TELEPORTATION</strong>
+                    <small>London → Mumbai Jump</small>
+                </button>
+                <button class="scenario-btn" onclick="loadScenario('bot', event)">
+                    <strong>BOT BURST</strong>
+                    <small>High Speed Attack</small>
+                </button>
+                <button class="scenario-btn" onclick="loadScenario('cycle', event)">
+                    <strong>MONEY CIRCLE</strong>
+                    <small>Laundering Loop</small>
+                </button>
+                <button class="scenario-btn" onclick="loadScenario('whale', event)">
+                    <strong>WHALE ALERT</strong>
+                    <small>Massive High Amount</small>
+                </button>
+                <button class="scenario-btn" onclick="loadScenario('jump', event)">
+                    <strong>NETWORK JUMP</strong>
+                    <small>Unrelated Network</small>
+                </button>
+                <button class="scenario-btn" onclick="loadScenario('duplicate', event)">
+                    <strong>GHOST PAYMENT</strong>
+                    <small>Duplicate ID Attack</small>
+                </button>
+                <button class="scenario-btn" onclick="loadScenario('future', event)">
+                    <strong>FUTURE TXN</strong>
+                    <small>Timestamp Violation</small>
+                </button>
+                <button class="scenario-btn" onclick="loadScenario('corrupt', event)">
+                    <strong>CORRUPT DATA</strong>
+                    <small>Missing Identity</small>
+                </button>
+                <button class="scenario-btn" onclick="loadScenario('zero', event)">
+                    <strong>ZERO AMOUNT</strong>
+                    <small>Suspicious Metadata</small>
+                </button>
+                <button class="scenario-btn" onclick="loadScenario('new', event)">
+                    <strong>NEW USER</strong>
+                    <small>Random Normal Txn</small>
+                </button>
+                <button class="reset-judge-btn" onclick="resetJudgeContext()">
+                    RESET ENGINE CONTEXT
+                </button>
+            </div>
+
+            <button class="tech-details-btn" onclick="showJudgeHistory()"
+                style="display: block; width: 100%; margin: 15px 0 0 0; text-align: center;">
+                [ VIEW SESSION HISTORY ]
+            </button>
+        </div>
+
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="history-overlay">
+        <div class="history-modal">
+            <div class="modal-header">
+                <h2>Forensic Ledger</h2>
+                <button onclick="closeHistoryModal()" class="close-modal">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="history-table-container">
+                    <h3>Recent Transactions</h3>
+                    <table id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Sender</th>
+                                <th>Receiver</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <!-- Rows injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/phonepe.js') }}"></script>

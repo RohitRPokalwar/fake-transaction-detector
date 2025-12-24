@@ -51,31 +51,31 @@ class Explain:
         r_text = " ".join(all_reasons_merged).lower()
 
         # PRIORITY 1: Confirmed Structural Fraud (Loops/Cycles)
-        if any("Laundering" in r or "Loop" in r or "Ping-Pong" in r or "Cycle" in r for r in all_reasons_merged):
-            fraud_type = "Money Laundering Detection"
+        if any("Laundering" in r or "Loop" in r or "Ping-Pong" in r or "Cycle" in r or "Circle" in r for r in all_reasons_merged):
+            fraud_type = "Organized Money Laundering"
         
         # PRIORITY 2: Deterministic Rule Violations (Definitive Checks)
-        elif "duplicate" in r_text:
-            fraud_type = "Transaction Duplicate"
-        elif "negative" in r_text or "zero" in r_text or ("amount" in r_text and "0.0" in r_text):
-            fraud_type = "Invalid Amount Anomaly"
-        elif "future" in r_text or "timestamp" in r_text:
-            fraud_type = "Timestamp Violation"
+        elif "copy-paste" in r_text or "duplicate" in r_text:
+            fraud_type = "Transaction Replay Attack"
+        elif "ghost" in r_text or "negative" in r_text or "zero" in r_text:
+            fraud_type = "Invalid Money Value"
+        elif "travel" in r_text or "future" in r_text or "timestamp" in r_text:
+            fraud_type = "Time/Location Logic Error"
         
-        # PRIORITY 3: Statistical Graph Signals (Community/Rings)
-        elif any("Community" in r for r in all_reasons_merged):
-            fraud_type = "Suspicious Group Interaction"
+        # PRIORITY 3: Statistical Graph Signals (Stranger Danger)
+        elif "stranger" in r_text or any("Community" in r for r in all_reasons_merged):
+            fraud_type = "Suspicious Network Jump"
         
         # PRIORITY 4: Behavioral/Velocity Rules
         elif reasons:
-            if "location" in r_text:
-                fraud_type = "Location Conflict"
-            elif "gap" in r_text or "velocity" in r_text or "burst" in r_text:
-                fraud_type = "High Velocity (Burst)"
-            elif "missing" in r_text:
-                fraud_type = "Data Integrity Violation"
+            if "teleportation" in r_text or "location" in r_text:
+                fraud_type = "Physical Impossibility"
+            elif "burst" in r_text or "velocity" in r_text:
+                fraud_type = "High-Speed Bot Attack"
+            elif "incomplete" in r_text or "missing" in r_text:
+                fraud_type = "Broken Identity Data"
             else:
-                fraud_type = "Rule Violation"
+                fraud_type = "Security Policy Violation"
 
         # PRIORITY 3: ML Explanation (Behavioral - SHAP)
         # Only run this if no hard rules/graphs were found, to explain "The Why" of the ML score
@@ -104,7 +104,7 @@ class Explain:
                 pass
         
         # 2. Construct "Why it's suspicious" narrative (EXCLUSIVE)
-        if any("Laundering" in r or "Loop" in r or "Ping-Pong" in r or "Cycle" in r for r in all_reasons_merged):
+        if any("Laundering" in r or "Loop" in r or "Ping-Pong" in r or "Cycle" in r or "Circle" in r for r in all_reasons_merged):
             # Find the specific cycle desc if available
             cycle_desc = ""
             for r in all_reasons_merged:
@@ -113,22 +113,22 @@ class Explain:
                     break
             
             if "Ping-Pong" in r_text:
-                why_suspicious = "Detected a direct back-and-forth money transfer pattern between two accounts, which is a common indicator of 'smurfing' or testing transaction limits."
+                why_suspicious = "Money is bouncing back and forth rapidly between two accounts—a classic tactic to test transaction limits."
             else:
-                why_suspicious = f"Sophisticated circular laundering pattern identified: {cycle_desc or 'Funds are being moved through a closed loop to obscure their origin.'}"
+                why_suspicious = f"A hidden money-cleansing ring was found. Funds are moving in a loop: {cycle_desc or 'moving through a closed circle to hide their origin.'}"
 
         elif reasons:
             # Display unique rule violations as a natural list
             unique_reasons = list(dict.fromkeys(reasons))
-            why_suspicious = "Significant policy violations: " + ", ".join(unique_reasons) + "."
+            why_suspicious = "The system blocked this because: " + ", ".join(unique_reasons) + "."
             
         elif top_factors:
              readable_factors = [f.replace('_', ' ') for f in top_factors]
-             why_suspicious = f"Unusual statistical behavioral patterns detected in {', '.join(readable_factors)} compared to user history."
+             why_suspicious = f"This transaction looks weird for this user. Specifically, the {', '.join(readable_factors)} don't match their usual habits."
         elif ml_score > 0.6:
-             why_suspicious = "The transaction deviates significantly (top 5 percentile) from the learned behavioral model of legitimate activity."
+             why_suspicious = "Our AI model flagged this because it looks significantly different from 95% of normal transactions."
         else:
-             why_suspicious = "Anomalous signature identified by the hybrid weighted scoring engine."
+             why_suspicious = "Suspicious digital fingerprint identified by our hybrid security engine."
 
         # Combine rule reasons and graph reasons for the "Triggered Rule" display
         # We use a set to avoid duplicates and join with ' | ' for a techy look
@@ -141,23 +141,6 @@ class Explain:
         
         triggered_rules_display = " | ".join(unique_all_reasons) if unique_all_reasons else "Pure Statistical Anomaly"
 
-        # 3. Construct "Normal Pattern" comparison
-        comparison_html = "System expects standard peer-to-peer or merchant behavior."
-        if global_stats and row:
-            comps = []
-            # Amount
-            if 'amount' in row and 'mean_amount' in global_stats:
-                amt = float(row['amount'])
-                avg = global_stats['mean_amount']
-                if amt > avg * 1.5:
-                     comps.append(f"Amount: <b>₹{amt:,.2f}</b> (Network Typical: ₹{avg:,.2f})")
-            
-            if comps:
-                comparison_html = "<br>".join(comps)
-            elif not is_anomalous:
-                comparison_html = "Values align with established statistical baselines."
-            else:
-                comparison_html = "Data points deviate from the multifaceted behavioral baseline established for this user/network."
 
         # 4. Confidence Score
         # If a deterministic rule/graph algo triggered, we are 100% confident.
@@ -171,7 +154,6 @@ class Explain:
         <div style="font-family: 'Inter', sans-serif; font-size: 0.9rem; line-height: 1.6;">
             <div style="margin-bottom: 5px;"><strong>Triggered Rule:</strong> <span style="color: #ff3b3b;">{triggered_rules_display}</span></div>
             <div style="margin-bottom: 5px;"><strong>Why Suspicious:</strong> {why_suspicious}</div>
-            <div style="margin-bottom: 5px;"><strong>Normal Pattern:</strong> <div style="padding-left: 20px; font-size: 0.85rem; color: #666;">{comparison_html}</div></div>
             <div style="margin-bottom: 5px;"><strong>Confidence:</strong> <b>{confidence}%</b></div>
             <div style="margin-bottom: 5px;"><strong>Probable Type:</strong> <span style="background: rgba(255, 59, 59, 0.1); color: #ff3b3b; padding: 2px 6px; border-radius: 4px; font-weight: 600;">{fraud_type}</span></div>
         </div>

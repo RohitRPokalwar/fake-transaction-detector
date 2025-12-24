@@ -15,7 +15,7 @@ from utils.scoring import HybridScorer
 from utils.explain import Explain
 from utils.graph_anomaly import GraphAnomalyDetector
 from utils.profiling import UserProfiler
-from utils.report_generator import ReportGenerator
+from utils.report_generator_v2 import ReportGeneratorV2 as ReportGenerator
 import os
 
 app = Flask(__name__)
@@ -56,7 +56,7 @@ def get_or_process_data(file_id):
         
     # Graph-based anomaly detection
     graph_detector = GraphAnomalyDetector()
-    graph_scores = graph_detector.detect_anomalies(df)
+    graph_scores, graph_reasons_list, node_paths = graph_detector.detect_anomalies(df)
     
     # Hybrid scoring
     scorer = HybridScorer()
@@ -157,164 +157,92 @@ def view_presentation():
 
 @app.route('/api/analyze/<file_id>', methods=['GET'])
 def analyze(file_id):
-    """Analyze uploaded CSV for fake transactions in streaming mode."""
-    def generate():
-        try:
-            if file_id not in uploaded_files:
-                yield f"data: {json.dumps({'error': 'File not found'})}\n\n"
-                return
+    """Analyze uploaded CSV for fake transactions and return all results at once."""
+    try:
+        if file_id not in uploaded_files:
+            return jsonify({'error': 'File not found'}), 404
 
-            file_content = uploaded_files[file_id]
+        file_content = uploaded_files[file_id]
+        csv_reader = csv.DictReader(io.StringIO(file_content))
+        rows = []
+        for row in csv_reader:
+            rows.append(row)
 
-            # Stream CSV processing
-            csv_reader = csv.DictReader(io.StringIO(file_content))
-            rows = []
-            headers = None
+        if not rows:
+            return jsonify({'error': 'Empty CSV file'}), 400
 
-            # First pass: collect all rows for preprocessing and ML training
-            for row in csv_reader:
-                if headers is None:
-                    headers = list(row.keys())
-                rows.append(row)
+        total_transactions = len(rows)
+        df = pd.DataFrame(rows)
+        
+        # Core Engines
+        preprocessor = Preprocessor()
+        df = preprocessor.clean_data(df)
+        
+        ddie = DDIE()
+        rule_results = ddie.apply_rules(df)
+        
+        ssg = SSG()
+        stats = ssg.compute_global_stats(df)
+        
+        uaic = UAIC()
+        if total_transactions >= 20: 
+            uaic.fit(df)
+        
+        graph_detector = GraphAnomalyDetector()
+        graph_scores, graph_reasons_list, node_paths = graph_detector.detect_anomalies(df)
+        
+        # Scoring & Explanation
+        scorer = HybridScorer()
+        user_freqs = df['user_id'].value_counts().to_dict() if 'user_id' in df.columns else {}
+        ml_scores = [uaic.predict_single(row, df, precomputed_freqs=user_freqs) if total_transactions >= 20 else 0.0 for row in rows]
+        scorer.auto_tune_threshold(rule_results['rule_score'].tolist(), ml_scores, graph_scores)
+        
+        explainer = Explain()
+        if total_transactions >= 20 and uaic.model is not None:
+            features = uaic._create_features(df)
+            explainer.setup_explainer(uaic.model, features, ['transaction_amount', 'hour_sin', 'hour_cos', 'day_sin', 'day_cos', 'user_transaction_frequency'])
 
-            if not rows:
-                yield f"data: {json.dumps({'error': 'Empty CSV file'})}\n\n"
-                return
+        all_results = []
+        anomalous_count = 0
+        final_scores, is_anomalous_list, explanations = [], [], []
 
-            total_transactions = len(rows)
-            logger.info(f"Loaded CSV with {total_transactions} rows")
-
-            # Convert to DataFrame for preprocessing
-            df = pd.DataFrame(rows)
-            logger.info("Converted to DataFrame")
-
-            # Preprocess
-            preprocessor = Preprocessor()
-            df = preprocessor.clean_data(df)
-            logger.info("Preprocessing completed")
-
-            # Apply DDIE rules
-            ddie = DDIE()
-            rule_results = ddie.apply_rules(df)
-            logger.info("DDIE rules applied")
-
-            # Compute stats
-            ssg = SSG()
-            stats = ssg.compute_global_stats(df)
-            logger.info("Statistical signatures computed")
-
-            # ML anomaly detection - fit on full data first
-            uaic = UAIC()
-            if total_transactions >= 20:  # Minimum for ML
-                uaic.fit(df)
-                logger.info("ML model fitted on full data")
-            else:
-                logger.warning("Dataset too small for ML, using rule-only scoring")
-
-            # Graph-based anomaly detection
-            graph_detector = GraphAnomalyDetector()
-            graph_scores, graph_reasons_list = graph_detector.detect_anomalies(df)
-            logger.info("Graph-based anomaly detection completed")
-
-            # Hybrid scoring setup with auto-tuning
-            scorer = HybridScorer()
-            rule_scores = rule_results['rule_score'].tolist()
-            ml_scores = [uaic.predict_single(row, df) if total_transactions >= 20 else 0.0 for row in rows]
-            scorer.auto_tune_threshold(rule_scores, ml_scores, graph_scores)
-            logger.info(f"Auto-tuned threshold: {scorer.threshold}")
-
-            # Set up explainers with SHAP/LIME if ML model available
-            explainer = Explain()
+        for i, row_dict in enumerate(rows):
+            rule_score = rule_results.iloc[i]['rule_score']
+            reasons = rule_results.iloc[i]['reasons']
+            ml_score = ml_scores[i]
+            graph_score = graph_scores[i] if i < len(graph_scores) else 0.0
+            
+            final_score = scorer.compute_hybrid_score(rule_score, ml_score, graph_score)
+            is_anomalous = bool(scorer.is_anomalous(final_score))
+            
+            row_features = None
             if total_transactions >= 20 and uaic.model is not None:
-                features = uaic._create_features(df)
-                feature_names = ['transaction_amount', 'hour_sin', 'hour_cos', 'day_sin', 'day_cos', 'user_transaction_frequency']
-                explainer.setup_explainer(uaic.model, features, feature_names)
-                logger.info("SHAP/LIME explainers set up")
+                row_features = uaic._create_features_single(row_dict, df, precomputed_freqs=user_freqs)
+            
+            explanation = explainer.generate_explanation(reasons, ml_score, row_features, uaic.model if total_transactions >= 20 else None, is_anomalous, row=row_dict, global_stats=stats, graph_reasons=graph_reasons_list[i] if i < len(graph_reasons_list) else None)
+            
+            res_row = row_dict.copy()
+            res_row.update({'final_score': float(final_score), 'is_anomalous': is_anomalous, 'explanation': explanation})
+            res_row['details'] = {
+                'rule_score': float(rule_score), 'ml_score': float(ml_score), 'graph_score': float(graph_score),
+                'weights': {'rule': scorer.rule_weight, 'ml': scorer.ml_weight, 'graph': scorer.graph_weight},
+                'node_path': node_paths[i] if i < len(node_paths) else None
+            }
+            if is_anomalous: anomalous_count += 1
+            all_results.append(res_row)
+            final_scores.append(final_score); is_anomalous_list.append(is_anomalous); explanations.append(explanation)
 
-            # Stream results one by one
-            anomalous_count = 0
-            final_scores = []
-            is_anomalous_list = []
-            explanations = []
+        stats.update({'total_transactions': total_transactions, 'anomalous_count': anomalous_count, 'anomaly_rate': f"{(anomalous_count/total_transactions*100):.1f}%"})
+        
+        # Cache for historical retrieval
+        df['final_score'], df['is_anomalous'], df['explanation'] = final_scores, is_anomalous_list, explanations
+        processed_data_cache[file_id] = df
 
-            for i, row_dict in enumerate(rows):
-                # Get rule-based score for this row
-                rule_score = rule_results.iloc[i]['rule_score']
-                reasons = rule_results.iloc[i]['reasons']
+        return jsonify({'results': all_results, 'stats': stats})
 
-                # Get ML score for this row
-                if total_transactions >= 20:
-                    ml_score = uaic.predict_single(row_dict, df)
-                else:
-                    ml_score = 0.0
-
-                # Get Graph score
-                graph_score = graph_scores[i] if i < len(graph_scores) else 0.0
-
-                # Compute hybrid score
-                final_score = scorer.compute_hybrid_score(rule_score, ml_score, graph_score)
-                is_anomalous = bool(scorer.is_anomalous(final_score))
-
-                # Generate explanation with SHAP/LIME if available
-                row_features = None
-                if total_transactions >= 20 and uaic.model is not None:
-                    row_features = uaic._create_features_single(row_dict, df)
-                explanation = explainer.generate_explanation(reasons, ml_score, row_features, uaic.model if total_transactions >= 20 else None, is_anomalous, row=row_dict, global_stats=stats, graph_reasons=graph_reasons_list[i] if i < len(graph_reasons_list) else None)
-
-                # Prepare row data
-                row = row_dict.copy()
-                row['final_score'] = float(final_score)
-                row['is_anomalous'] = is_anomalous
-                row['explanation'] = explanation
-                
-                # Transparency details for breakdown
-                row['details'] = {
-                    'rule_score': float(rule_score),
-                    'ml_score': float(ml_score),
-                    'graph_score': float(graph_score),
-                    'weights': {
-                        'rule': scorer.rule_weight,
-                        'ml': scorer.ml_weight,
-                        'graph': scorer.graph_weight
-                    }
-                }
-                if row['is_anomalous']:
-                    anomalous_count += 1
-                
-                final_scores.append(final_score)
-                is_anomalous_list.append(is_anomalous)
-                explanations.append(explanation)
-
-                # Inject anomaly stats into the final stats object
-                if i == total_transactions - 1 and stats is not None:
-                    stats['total_transactions'] = total_transactions
-                    stats['anomalous_count'] = anomalous_count
-                    stats['anomaly_rate'] = f"{(anomalous_count / total_transactions * 100):.1f}%"
-
-                result = {
-                    'index': i,
-                    'row': row,
-                    'total_transactions': total_transactions,
-                    'anomalous_count': anomalous_count,
-                    'stats': stats if i == total_transactions - 1 else None  # Send stats only at the end
-                }
-                yield f"data: {json.dumps(result)}\n\n"
-
-            # Cache processed data
-            df['final_score'] = final_scores
-            df['is_anomalous'] = is_anomalous_list
-            df['explanation'] = explanations
-            processed_data_cache[file_id] = df
-            logger.info(f"Cached processed data for file {file_id}")
-
-            logger.info(f"Analysis completed: {anomalous_count} anomalies detected")
-
-        except Exception as e:
-            logger.error(f"Error during analysis: {str(e)}")
-            logger.error(traceback.format_exc())
-            yield f"data: {json.dumps({'error': 'Internal server error', 'details': str(e)})}\n\n"
-
-    return Response(generate(), mimetype='text/event-stream', headers={'Cache-Control': 'no-cache', 'Access-Control-Allow-Origin': '*'})
+    except Exception as e:
+        logger.error(f"Error: {traceback.format_exc()}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/user_profile/<file_id>/<user_id>', methods=['GET'])
 def user_profile(file_id, user_id):
@@ -388,7 +316,7 @@ def init_global_model():
             ml_scores = [uaic.predict_single(row.to_dict(), df) for _, row in df.iterrows()] if uaic.model else [0.0]*len(df)
             
             graph_detector = GraphAnomalyDetector()
-            graph_scores, _ = graph_detector.detect_anomalies(df)
+            graph_scores, _, _ = graph_detector.detect_anomalies(df)
             
             scorer = HybridScorer()
             scorer.auto_tune_threshold(rule_results['rule_score'].tolist(), ml_scores, graph_scores)
@@ -416,12 +344,16 @@ init_global_model()
 
 @app.route('/api/reset_judge', methods=['POST'])
 def reset_judge():
-    """Reset the Judge Mode context to its original state."""
+    """Reset the Judge Mode context to a truly empty state."""
+    # Ensure we have the standard columns
+    cols = ['transaction_id', 'user_id', 'recipient_id', 'amount', 'timestamp', 'location', 'is_anomalous', 'final_score', 'explanation']
+    
     if 'base_df' in global_model_context:
-        global_model_context['df'] = global_model_context['base_df'].copy()
-        logger.info("Judge Mode context reset to base state.")
-        return jsonify({'status': 'reset_complete'}), 200
-    return jsonify({'status': 'no_base_data'}), 200
+        cols = global_model_context['base_df'].columns
+        
+    global_model_context['df'] = pd.DataFrame(columns=cols)
+    logger.info("Judge Mode context reset to empty state.")
+    return jsonify({'status': 'reset_complete'}), 200
 
 @app.route('/api/judge', methods=['POST'])
 def judge_transaction():
@@ -477,14 +409,16 @@ def judge_transaction():
         # 2. Graph Check (Use the already cleaned augmented_df)
         graph_score = 0.0
         graph_reasons = []
+        node_path = None
         try:
             graph_detector = GraphAnomalyDetector()
-            g_scores, g_reasons_list = graph_detector.detect_anomalies(augmented_df)
+            g_scores, g_reasons_list, g_node_paths = graph_detector.detect_anomalies(augmented_df)
             
             if g_scores:
                 # The last transaction is the one we just added
                 graph_score = g_scores[-1]
                 graph_reasons = g_reasons_list[-1]
+                node_path = g_node_paths[-1]
         except Exception as e:
             logger.error(f"Judge Graph Error: {e}")
 
@@ -513,7 +447,6 @@ def judge_transaction():
         else:
             is_anomalous = bool(scorer.is_anomalous(final_score))
         
-        # 4. Explanation Generation (Structured HTML)
         # 4. Explanation Generation
         explainer = global_model_context.get('explainer')
         if not explainer:
@@ -524,10 +457,16 @@ def judge_transaction():
              row_features = uaic._create_features_single(row_dict, context_df)
              
         # Compute context stats for comparison
+        from utils.ssg import SSG
         ssg = SSG()
         context_stats = ssg.compute_global_stats(context_df)
         
         explanation = explainer.generate_explanation(reasons, ml_score, row_features, uaic.model if uaic else None, is_anomalous, row=row_dict, global_stats=context_stats, graph_reasons=graph_reasons)
+
+        # SAVE results back to the dataframe so history reflects reality
+        idx = global_model_context['df'].index[-1]
+        global_model_context['df'].at[idx, 'is_anomalous'] = is_anomalous
+        global_model_context['df'].at[idx, 'final_score'] = float(final_score)
 
         return jsonify({
             'is_anomalous': is_anomalous,
@@ -542,13 +481,39 @@ def judge_transaction():
                     'ml': scorer.ml_weight,
                     'graph': scorer.graph_weight
                 },
-                'threshold': scorer.threshold
+                'threshold': scorer.threshold,
+                'node_path': node_path
             }
         })
         
     except Exception as e:
         logger.error(f"Judge error: {e}")
         logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/judge_history', methods=['GET'])
+def get_judge_history():
+    """Retrieve the current history of transactions analyzed in Judge Mode."""
+    try:
+        df = global_model_context.get('df')
+        if df is None:
+            return jsonify({'history': []})
+            
+        # We need to return the transactions in a JSON serializable format
+        history = []
+        for _, row in df.iterrows():
+            item = row.to_dict()
+            # Handle non-serializable objects if any
+            for key, val in item.items():
+                if isinstance(val, pd.Timestamp):
+                    item[key] = val.isoformat()
+                elif isinstance(val, float) and pd.isna(val):
+                    item[key] = 0.0
+            history.append(item)
+            
+        return jsonify({'history': history})
+    except Exception as e:
+        logger.error(f"History retrieval error: {e}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

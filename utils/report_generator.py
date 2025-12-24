@@ -54,7 +54,7 @@ def clean_explanation(html_text):
     core = found_reasons[0]
     
     # Final cleanup of common long strings
-    core = core.replace("Money Laundering Loop Detected:", "ML Loop:").strip()
+    core = core.replace("Money Circle: Funds are moving in a loop to hide their source", "ML Loop:").strip()
     
     return f"DETECTION: {core}"
 
@@ -222,9 +222,9 @@ class ReportGenerator:
 
             top_10 = anomalies.head(10)
 
-            # Column widths: 45 for long Txn IDs, 30 for User IDs
-            col_widths = [45, 30, 20, 15, 80]
-            headers = ["TRANSACTION ID", "USER ID", "AMOUNT", "SCORE", "DETECTION LOG"]
+            # Column widths: 35 for long Txn IDs, 25 for User/Timestamp
+            col_widths = [35, 25, 25, 18, 12, 75]
+            headers = ["TRANSACTION ID", "USER ID", "TIME", "AMOUNT", "SC", "DETECTION LOG"]
 
             pdf.set_font("Arial", "B", 8)
             pdf.set_fill_color(230, 235, 245) # Professional bluish-gray header
@@ -242,13 +242,19 @@ class ReportGenerator:
                 # Robust ID Fetching
                 txn_id = get_col(row, ["transaction_id", "Transaction ID", "txn_id", "id", "trans_id", "transaction"])
                 user_id = get_col(row, ["user_id", "User ID", "uid", "sender_id", "customer_id"])
+                timestamp = get_col(row, ["timestamp", "Time", "Timestamp", "date_time", "txn_time"])
+                
+                # Cleanup timestamp for PDF (take only date/time if too long)
+                if len(timestamp) > 16:
+                    timestamp = timestamp[:16]
                 
                 pdf.multi_cell_row(
                     col_widths,
                     [
                         txn_id,
                         user_id,
-                        f"INR {float(row.get('amount', 0)):,.0f}",
+                        timestamp,
+                        f"{float(row.get('amount', 0)):,.0f}",
                         f"{row.get('final_score', 0):.2f}",
                         cleaned_explanation,
                     ],

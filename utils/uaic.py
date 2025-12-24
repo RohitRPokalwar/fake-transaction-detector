@@ -65,7 +65,7 @@ class UAIC:
 
         self.model.fit(features_scaled)
 
-    def predict_single(self, row_dict, df_context=None):
+    def predict_single(self, row_dict, df_context=None, precomputed_freqs=None):
         """
         Predict anomaly score for a single row.
         """
@@ -73,7 +73,7 @@ class UAIC:
             return 0.0
 
         # Create features for single row
-        features = self._create_features_single(row_dict, df_context)
+        features = self._create_features_single(row_dict, df_context, precomputed_freqs)
 
         # Scale features
         features_scaled = self.scaler.transform(features.reshape(1, -1))
@@ -132,7 +132,7 @@ class UAIC:
         else:
             return np.zeros((len(df), 1))
 
-    def _create_features_single(self, row_dict, df_context=None):
+    def _create_features_single(self, row_dict, df_context=None, precomputed_freqs=None):
         """
         Create features for a single row.
         """
@@ -167,7 +167,10 @@ class UAIC:
                 features.extend([[0.0], [0.0], [0.0], [0.0]])
 
         # User activity features
-        if 'user_id' in row_dict and df_context is not None:
+        if precomputed_freqs is not None:
+            user_freq = precomputed_freqs.get(row_dict.get('user_id'), 1)
+            features.append([user_freq])
+        elif 'user_id' in row_dict and df_context is not None:
             user_counts = df_context['user_id'].value_counts()
             user_freq = user_counts.get(row_dict['user_id'], 0)
             features.append([user_freq])

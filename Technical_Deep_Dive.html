@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIGILO | Technical Intelligence Architecture</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Outfit:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --card-bg: rgba(23, 28, 40, 0.8);
+            --accent-color: #00f2ea;
+            --text-primary: #e0e6ed;
+            --text-secondary: #94a3b8;
+            --danger: #ff3b3b;
+            --success: #00ff9d;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 242, 234, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 59, 59, 0.05) 0%, transparent 40%);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(0, 242, 234, 0.3);
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--text-primary);
+            margin: 40px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-color);
+            display: inline-block;
+        }
+
+        /* Utils Grid */
+        .utils-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .util-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .util-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+            box-shadow: 0 10px 30px rgba(0, 242, 234, 0.1);
+        }
+
+        .util-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-color);
+        }
+
+        .util-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .util-file {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .util-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .util-tech {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* Visualization Section */
+        .viz-box {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .viz-item {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .viz-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .viz-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 242, 234, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+
+        .viz-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .viz-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .tech-list {
+            list-style: none;
+        }
+
+        .tech-list li {
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tech-list li::before {
+            content: '▹';
+            color: var(--accent-color);
+        }
+
+        /* Security Highlights */
+        .security-banner {
+            background: linear-gradient(90deg, rgba(0, 242, 234, 0.1), transparent);
+            border-left: 4px solid var(--accent-color);
+            padding: 20px;
+            margin: 40px 0;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .security-banner h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 80px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            padding-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+
+            .utils-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .viz-box {
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .util-card {
+                padding: 20px;
+            }
+
+            header {
+                margin-bottom: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+                letter-spacing: 1px;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .util-name {
+                font-size: 1rem;
+                flex-wrap: wrap;
+            }
+
+            .viz-title {
+                font-size: 1.1rem;
+            }
+
+            .viz-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>VIGILO Intelligence Architecture</h1>
+            <p class="subtitle">Official Forensic Documentation & Presentation Script</p>
+        </header>
+
+        <h2 class="section-title">🎤 The Official "Good Evening" Pitch</h2>
+        <div class="viz-box" style="display: block; border-left: 5px solid var(--accent-color);">
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: var(--accent-color); margin-bottom: 10px;">Step 1: The Boot Sequence (The Loader)</h3>
+                <p class="util-desc"><i>"Good Evening Sir. As we launch VIGILO, you see a <b>Cybernetic Boot
+                            Sequence</b>. This isn't just an animation—it represents the system initializing its neural
+                        weights and establishing a secure handshake with the bank's core database. It ensures a
+                        sanitized environment before any data is processed."</i></p>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: var(--accent-color); margin-bottom: 10px;">Step 2: The Three Command Modes</h3>
+                <p class="util-desc"><i>"VIGILO is designed for 3 specific banking roles. We have the <b>Live Judge
+                            Mode</b> for manual investigation, the <b>Historical Bulk Scanner</b> for auditing, and the
+                        <b>Forensic Reporter</b> for executive documentation."</i></p>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: var(--accent-color); margin-bottom: 10px;">Step 3: CSV Intelligence (Drag & Drop)</h3>
+                <p class="util-desc"><i>"Observe the <b>CSV Intelligence Hub</b>. Bankers can simply drag a raw
+                        transaction log here. Unlike a standard spreadsheet, VIGILO instantly cleans the noise,
+                        calculates global statistics like 'Most Active User', and maps the data to our 3-layer AI Engine
+                        for real-time forensic scanning."</i></p>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: var(--accent-color); margin-bottom: 10px;">Step 4: The Live Forensic Path (Visual
+                    Proof)</h3>
+                <p class="util-desc"><i>"When we flag an anomaly, we don't just show a number. We visualize the
+                        <b>Forensic Path</b>. If a transaction is part of a Money laundering loop, our Graph Engine
+                        draws the connections between accounts live on screen. It turns invisible financial crimes into
+                        visible evidence for the bank's security team."</i></p>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: var(--accent-color); margin-bottom: 10px;">Step 5: Actionable Intelligence Dossier
+                </h3>
+                <p class="util-desc"><i>"Our final output is the <b>Intelligence Dossier</b>. This is a one-click PDF
+                        forensic report. It strips away all technical jargon and gives the Bank Manager a clean
+                        'Evidence List' with reasons like 'Zero-Value Attack' or 'Velocity Jump', so they can freeze
+                        accounts and prevent loss within seconds."</i></p>
+            </div>
+
+            <div>
+                <h3 style="color: var(--accent-color); margin-bottom: 10px;">Step 6: Scalability & Closing Statement
+                </h3>
+                <p class="util-desc"><i>"To conclude, VIGILO is built to handle millions of transactions with <b>Native
+                            Privacy</b>. We use salted hashing to protect user identity, and our hybrid model ensures
+                        that even if a hacker bypasses our AI, they cannot cheat our Graph or Rule engines. VIGILO is
+                        not just a tool—it's the future of trust in digital finance. Thank you!"</i></p>
+            </div>
+        </div>
+
+        <h2 class="section-title">📂 Forensic Engine Modules (Technical Deep Dive)</h2>
+        <div class="utils-grid">
+            <!-- DDIE Details -->
+            <div class="util-card">
+                <div class="util-name">1. Rule Engine (ddie.py)</div>
+                <p class="util-desc">The <b>Deterministic Data Integrity Engine</b> acts as the system's "First Filter".
+                    It uses high-speed Boolean operations to scan for logical impossibilities.</p>
+                <ul class="tech-list" style="margin-top:10px;">
+                    <li><b>Duplicate Detection:</b> Identifies "Replay Attacks" where a single Transaction ID is
+                        submitted multiple times.</li>
+                    <li><b>Temporal Audit:</b> Flags "Future Transactions" and impossible time gaps.</li>
+                    <li><b>Value Constraints:</b> Detects negative amounts or zero-value pings used by bots for account
+                        verification.</li>
+                    <li><b>Location Jump:</b> Mathematical calculation of velocity (Distance / Time) to flag impossible
+                        travel.</li>
+                </ul>
+            </div>
+
+            <!-- UAIC Details -->
+            <div class="util-card" style="border-color: #ff3b3b;">
+                <div class="util-name">2. Behavioral AI (uaic.py)</div>
+                <p class="util-desc">The <b>User Activity Integrated Classifier</b> uses Unsupervised Machine Learning
+                    to model human behavior without needing labeled "fraud" data.</p>
+                <ul class="tech-list" style="margin-top:10px;">
+                    <li><b>Algorithm:</b> Isolation Forest (Ensemble based). It works by isolating observations by
+                        randomly selecting a feature and a split value.</li>
+                    <li><b>Feature Engineering:</b> Encodes Time as Sine/Cosine waves to capture "Circular Time" (e.g.,
+                        11 PM and 1 AM are close).</li>
+                    <li><b>Outlier Scoring:</b> Assigns an anomaly score based on how "easy" it is to isolate a point in
+                        the decision tree.</li>
+                </ul>
+            </div>
+
+            <!-- Graph Details -->
+            <div class="util-card">
+                <div class="util-name">3. Network Graph (graph_anomaly.py)</div>
+                <p class="util-desc">This module uses <b>Network Theory</b> to analyze the relationships between senders
+                    and receivers.</p>
+                <ul class="tech-list" style="margin-top:10px;">
+                    <li><b>Cycle Detection:</b> Uses DFS (Depth-First Search) to find Money Laundering loops (A → B → C
+                        → A).</li>
+                    <li><b>Star Topologies:</b> Detects "Bot Sinks" where one merchant receives 1000s of tiny payments
+                        from unique accounts in seconds.</li>
+                    <li><b>Multi-Hop Analysis:</b> Tracks the "Flow of Capital" across up to 5 layers of accounts to
+                        find hidden kingpins.</li>
+                </ul>
+            </div>
+
+            <!-- Explain Details -->
+            <div class="util-card">
+                <div class="util-name">4. AI Investigator (explain.py)</div>
+                <p class="util-desc">Ensures the system is not a "Black Box". It uses <b>Explainable AI (XAI)</b> to
+                    justify every alert.</p>
+                <ul class="tech-list" style="margin-top:10px;">
+                    <li><b>SHAP Analysis:</b> Calculates the Shapley value for each feature (Amount, Time, Location) to
+                        show its percentage contribution to the risk.</li>
+                    <li><b>Narrative Logic:</b> A custom NLP template engine that translates raw weights into sentences
+                        like "High Risk due to 5x average volume."</li>
+                    <li><b>Forensic Confidence:</b> Assigns a certainty percentage to every detection.</li>
+                </ul>
+            </div>
+
+            <!-- Preprocess Details -->
+            <div class="util-card">
+                <div class="util-name">5. Data Sanitizer (preprocess.py)</div>
+                <p class="util-desc">A robust pipeline built on <b>Python Pandas</b> for industrial-strength data
+                    cleaning.</p>
+                <ul class="tech-list" style="margin-top:10px;">
+                    <li><b>Auto-Correction:</b> Normalizes messy column names (e.g., 'Txn_Amt' to 'amount').</li>
+                    <li><b>Standardization:</b> Converts all timestamps to ISO 8601 format for math operations.</li>
+                    <li><b>Missing Data Handling:</b> Uses "Imputation" to fill gaps without breaking the AI model.</li>
+                </ul>
+            </div>
+
+            <!-- Report Details -->
+            <div class="util-card">
+                <div class="util-name">6. Forensic Reporter (report_generator.py)</div>
+                <p class="util-desc">The final layer that converts AI data into <b>Court-Admissible Evidence</b>.</p>
+                <ul class="tech-list" style="margin-top:10px;">
+                    <li><b>PDF Generation:</b> Uses the <b>ReportLab</b> library for pixel-perfect dynamic layouts.</li>
+                    <li><b>Anomaly Breakdown:</b> Automatically groups frauds into categories (Laundering, Bot,
+                        Duplicate).</li>
+                    <li><b>Summary Analytics:</b> Embeds the final stats (Total volume, Anomaly Rate) for executive
+                        review.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2 class="section-title">📱 Mobile Responsiveness & Design</h2>
+        <div class="viz-box">
+            <div class="viz-item">
+                <div class="viz-header">
+                    <div class="viz-icon">�</div>
+                    <div class="viz-title">Multi-Platform Fluidity</div>
+                </div>
+                <p class="viz-text">VIGILO isn't just for desktops; it's a mobile-first dashboard. We achieved this
+                    through:</p>
+                <ul class="tech-list">
+                    <li><b>Flexbox & Grid:</b> Components like the 'Result Card' and 'Stats Grid' reflow automatically
+                        based on screen width.</li>
+                    <li><b>Media Queries:</b> Custom breakpoints (768px/480px) ensure the Forensic Ledger remains
+                        readable on smartphones.</li>
+                    <li><b>Liquid Viewports:</b> We use <b>rem</b> and <b>vh/vw</b> units so typography and spacing feel
+                        premium on everything from an iPhone to a 4K monitor.</li>
+                </ul>
+            </div>
+            <div class="viz-item">
+                <div class="viz-header">
+                    <div class="viz-icon">🎨</div>
+                    <div class="viz-title">Neo-Fintech Aesthetics</div>
+                </div>
+                <p class="viz-text">We used "Glassmorphism"—a design style where UI elements look like frosted glass,
+                    using <b>backdrop-filter: blur()</b>. This ensures the dashboard feels modern, professional, and
+                    state-of-the-art.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">Step-by-Step Prototype Demo Script</h2>
+        <div class="viz-box"
+            style="display: block; background: rgba(0, 242, 234, 0.05); border: 1px dashed var(--accent-color);">
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: var(--accent-color); margin-bottom: 15px; font-family: 'Orbitron'; font-size: 1rem;">
+                    SCENARIO 1: The Teleportation Alert 🚀</h3>
+                <p class="viz-text"><b>How to show:</b> Set Sender to "User_A", Location to "London", and scan. Then
+                    quickly change Location to "Mumbai" and scan again.</p>
+                <p class="util-desc" style="font-style: italic;">"Sir/Ma'am, look at this. The user sends money from
+                    London, then 2 seconds later from Mumbai. This is physically impossible. Our <b>Location Logic</b>
+                    triggers a 'Teleportation' flag instantly."</p>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: var(--accent-color); margin-bottom: 15px; font-family: 'Orbitron'; font-size: 1rem;">
+                    SCENARIO 2: The Bot Burst (High Velocity) 🤖</h3>
+                <p class="viz-text"><b>How to show:</b> Click the "SECURE SCAN" button twice very fast (double-click).
+                </p>
+                <p class="util-desc" style="font-style: italic;">"I’m acting like a bot script trying to overwhelm the
+                    server. By clicking twice in a second, the <b>UAIC Engine</b> catches the 'High Velocity' burst. No
+                    human can type that fast—it's 100% a bot attack."</p>
+            </div>
+
+            <div>
+                <h3 style="color: var(--accent-color); margin-bottom: 15px; font-family: 'Orbitron'; font-size: 1rem;">
+                    SCENARIO 3: The Money Circle (Laundering) 🕸️</h3>
+                <p class="viz-text"><b>How to show:</b> Send 3 Txns: Alice → Bob → Charlie → Alice (all same amount).
+                </p>
+                <p class="util-desc" style="font-style: italic;">"Criminals hide money by moving it in circles. As soon
+                    as the 'Charlie → Alice' transaction hits, our <b>Graph Topology Scanner</b> detects the closed loop
+                    and breaks the laundering ring."</p>
+            </div>
+        </div>
+
+        <div class="security-banner">
+            <h3>🔒 PRIVACY & SECURITY DEFENSES</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">To prevent hacks and protect privacy, VIGILO
+                implements <b>Salted Hashing</b> for identity protection, <b>CORS</b> for API shielding, and
+                <b>Adversarial Robustness</b> through its three-layer hybrid detection model. No PII (Personally
+                Identifiable Information) is required for detection.
+            </p>
+        </div>
+
+        <footer>
+            VIGILO FORENSIC SUITE | DESIGNED FOR TECHNICAL AUDITS & VIVA PRESENTATIONS
+        </footer>
+    </div>
+
+</body>
+
+</html>

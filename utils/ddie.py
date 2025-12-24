@@ -52,8 +52,9 @@ class DDIE:
             
             # If this is not the first occurrence
             if len(duplicates) > 1 and row.name > duplicates.index[0]:
-                 original_idx = duplicates.index[0]
-                 return 0.9, "Duplicate: Replay of Previous Transaction"
+                 orig = duplicates.iloc[0]
+                 orig_id = orig['transaction_id'] if 'transaction_id' in orig else f"Row {duplicates.index[0]}"
+                 return 0.9, f"Duplicate Transaction (Matches {orig_id})"
                  
         return 0.0, None
 
@@ -65,7 +66,7 @@ class DDIE:
                 ts = pd.to_datetime(row['timestamp'], errors='coerce')
                 
                 if pd.isna(ts):
-                    return 0.6, "Invalid timestamp format"
+                    return 0.6, "Broken Time: Date format is unreadable"
                 
                 # Compare with current time (timezone naive)
                 now = pd.Timestamp.now().replace(tzinfo=None)
@@ -75,11 +76,11 @@ class DDIE:
                 if ts > now:
                     # Check if it's way in the future (e.g. > 1 day) to avoid clock skew issues
                     if (ts - now).total_seconds() > 86400:
-                         return 0.9, f"Future timestamp detected (Year {ts.year})"
+                         return 0.9, "Future Date Transaction"
                     else:
-                         return 0.8, "Future timestamp detected"
+                         return 0.8, "Future Date Transaction"
             except Exception as e:
-                return 0.6, f"Timestamp check error: {str(e)}"
+                return 0.6, "Broken Time: Date format is unreadable"
         return 0.0, None
 
     def _check_amounts(self, row, df):
@@ -89,9 +90,9 @@ class DDIE:
                 # Force conversion to float
                 amount = float(row['amount'])
                 if amount <= 0:
-                    return 0.9, f"Negative or zero amount ({amount})"
+                    return 0.9, "Negative/Zero Amount Transaction"
                 if amount > 1000000:  # Higher threshold
-                    return 0.7, "Extreme amount detected"
+                    return 0.7, "Extreme Wealth Alert: Amount is unusually high"
             except:
                 pass 
         return 0.0, None
@@ -101,7 +102,7 @@ class DDIE:
         mandatory_fields = ['transaction_id', 'user_id', 'amount', 'timestamp', 'location', 'recipient_id']
         missing = [field for field in mandatory_fields if field not in row or pd.isna(row[field])]
         if missing:
-            return 0.8, f"Missing mandatory fields: {', '.join(missing)}"
+            return 0.8, f"Incomplete File: Important identity details are missing ({', '.join(missing)})"
         return 0.0, None
 
     def _check_time_gaps(self, row, df):
@@ -134,7 +135,7 @@ class DDIE:
                 ]
                 
                 if len(neighbors) > 1:
-                     return 0.6, "High Velocity (Burst) detected"
+                     return 0.6, "Less than 2sec Transaction"
             except:
                 pass
         return 0.0, None
@@ -173,7 +174,7 @@ class DDIE:
                      if loc1 != loc2 and loc1 != 'unknown' and loc2 != 'unknown':
                          time_diff = (t2['timestamp'] - t1['timestamp']).total_seconds()
                          if abs(time_diff) < 600: # Less than 10 mins for different cities
-                             return 0.7, f"Impossible Travel: {loc1} to {loc2} in {int(abs(time_diff)/60)}m"
+                             return 0.7, "Impossible Location Jump"
             except:
                 pass
         return 0.0, None

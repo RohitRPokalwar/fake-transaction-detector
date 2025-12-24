@@ -208,6 +208,32 @@ header p {
     color: var(--text-main);
 }
 
+.btn-judge-mode {
+    background: rgba(255, 166, 0, 0.1);
+    color: #ffa600;
+    font-weight: 700;
+    padding: 16px 30px;
+    border: 2px solid #ffa600;
+    border-radius: var(--btn-radius);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 0 15px rgba(255, 166, 0, 0.1);
+}
+
+.btn-judge-mode:hover {
+    background: #ffa600;
+    color: #000;
+    box-shadow: 0 0 40px rgba(255, 166, 0, 0.4);
+    transform: translateY(-2px);
+}
+
 /* Loader */
 .loader {
     text-align: center;
@@ -439,16 +465,16 @@ tr.anomalous:hover td {
 
 /* Modal */
 .modal {
-    display: flex;
+    display: none;
+    /* Changed from flex to none by default, JS will show it */
     position: fixed;
     z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background: rgba(0, 0, 0, 0.9);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(12px);
     justify-content: center;
     align-items: center;
 }
@@ -460,28 +486,66 @@ tr.anomalous:hover td {
     box-shadow: 0 0 50px rgba(0, 242, 234, 0.2);
     padding: 0;
     overflow: hidden;
-
     width: 90%;
     max-width: 700px;
-
-    /* Ensure it centers correctly */
-    margin: 0 auto;
+    margin: 20px auto;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    /* Ensure it fits on screen */
 }
 
+/* New Persistent Header */
+.modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 11, 30, 0.95);
+    backdrop-filter: blur(15px);
+    padding: 20px 40px;
+    border-bottom: 1px solid rgba(0, 242, 234, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 1px;
+}
+
+.modal-inner-body {
+    overflow-y: auto;
+    flex: 1;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-accent) transparent;
+}
 
 .close {
-    position: absolute;
-    top: 24px;
-    right: 24px;
-    font-size: 24px;
+    order: 2;
+    font-size: 28px;
+    font-weight: 300;
     cursor: pointer;
     color: var(--text-muted);
-    transition: color 0.3s ease;
-    z-index: 10;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    line-height: 1;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-right: -10px;
 }
 
 .close:hover {
-    color: var(--primary-accent);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(90deg) scale(1.1);
 }
 
 /* Detail Grid */
@@ -665,15 +729,22 @@ tr.anomalous:hover td {
     border: 1px solid var(--primary-accent);
     box-shadow: 0 0 50px rgba(0, 242, 234, 0.2);
     max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
 }
 
 .profile-header {
-    padding: 30px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 25px 30px;
     border-bottom: 1px solid var(--glass-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(0, 242, 234, 0.02);
+    background: rgba(10, 11, 30, 0.98);
+    backdrop-filter: blur(15px);
 }
 
 .profile-header h2 {
@@ -802,18 +873,25 @@ tr.anomalous:hover td {
 }
 
 .close-profile {
-    position: absolute;
-    top: 30px;
-    right: 30px;
-    font-size: 24px;
+    order: 3;
+    font-size: 28px;
     cursor: pointer;
     color: var(--text-muted);
-    transition: color 0.3s ease;
-    z-index: 10;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-right: -10px;
+    line-height: 1;
 }
 
 .close-profile:hover {
-    color: var(--primary-accent);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(90deg) scale(1.1);
 }
 
 /* Requirements Button */
@@ -1897,83 +1975,103 @@ tr.anomalous:hover td {
 }
 
 /* Scoring Decomposition Styles */
+/* Scoring Decomposition Styles - Refined for Clarity */
 .breakdown-header {
     font-family: 'Outfit', sans-serif;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--secondary-accent);
     letter-spacing: 2px;
-    margin-bottom: 20px;
-    font-weight: 700;
+    margin-bottom: 15px;
+    font-weight: 800;
+    text-transform: uppercase;
+    opacity: 0.9;
 }
 
 .score-details-container {
-    background: rgba(112, 0, 255, 0.03);
-    border: 1px solid rgba(112, 0, 255, 0.1);
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 25px;
+    background: rgba(112, 0, 255, 0.05);
+    border: 1px solid rgba(112, 0, 255, 0.15);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: inset 0 0 20px rgba(112, 0, 255, 0.05);
 }
 
 .score-row {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-.score-row.total {
-    margin-top: 15px;
-    margin-bottom: 0;
+.score-row:last-of-type {
+    border-bottom: none;
+    margin-bottom: 5px;
 }
 
 .score-label {
-    flex: 1;
-    color: var(--text-muted);
+    color: #a0a0a0;
     font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.score-value-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
 .score-value {
     color: #fff;
-    font-weight: 600;
-    font-size: 1rem;
-    min-width: 50px;
-    text-align: right;
+    font-weight: 700;
+    font-size: 1.1rem;
+    line-height: 1;
 }
 
 .score-weight {
     color: #666;
-    font-size: 0.75rem;
-    font-family: monospace;
-    min-width: 90px;
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 4px;
 }
 
 .score-divider {
     height: 1px;
-    background: linear-gradient(90deg, rgba(112, 0, 255, 0.2), transparent);
-    margin: 15px 0;
+    background: linear-gradient(90deg, rgba(112, 0, 255, 0.3), transparent);
+    margin: 20px 0;
+}
+
+.score-row.total {
+    margin-top: 5px;
+    background: rgba(0, 242, 234, 0.03);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 242, 234, 0.1);
 }
 
 .score-row.total .score-label {
     color: #fff;
-    font-weight: 700;
-    text-transform: uppercase;
+    font-weight: 800;
+    font-size: 0.9rem;
 }
 
 .score-row.total .score-value {
     color: var(--primary-accent);
-    font-size: 1.3rem;
-    text-shadow: 0 0 15px rgba(0, 242, 234, 0.3);
+    font-size: 1.5rem;
+    text-shadow: 0 0 20px rgba(0, 242, 234, 0.4);
 }
 
 @media (max-width: 480px) {
     .score-row {
-        flex-wrap: wrap;
-        gap: 5px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
     }
 
-    .score-weight {
+    .score-value-group {
+        align-items: flex-start;
         width: 100%;
-        text-align: right;
     }
 }
 
@@ -2042,5 +2140,258 @@ tr.anomalous:hover td {
 
     .guide-item {
         width: 100%;
+    }
+}
+
+/* Bank Manager Protocol Styles - Enhanced for Forensic Clarity */
+.protocol-section {
+    margin-top: 35px;
+    padding: 25px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+
+.protocol-header {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+    color: #ffd700;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.protocol-header::after {
+    content: "";
+    height: 1px;
+    flex: 1;
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.2), transparent);
+}
+
+.protocol-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.btn-protocol {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 15px 10px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-protocol .icon {
+    font-size: 1.4rem;
+    margin-bottom: 2px;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.1));
+}
+
+.btn-protocol:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.btn-protocol.freeze:hover {
+    border-color: #ff8c00;
+    box-shadow: 0 8px 25px rgba(255, 140, 0, 0.25);
+}
+
+.btn-protocol.approve:hover {
+    border-color: #00ff9d;
+    box-shadow: 0 8px 25px rgba(0, 255, 157, 0.25);
+}
+
+.btn-protocol.report:hover {
+    border-color: #4dabff;
+    box-shadow: 0 8px 25px rgba(77, 171, 255, 0.25);
+}
+
+.protocol-feedback {
+    background: #0a0a0a;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 18px;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    min-height: 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.protocol-feedback::before {
+    content: "SYSTEM_LOG";
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 0.6rem;
+    color: #444;
+}
+
+.danger-text {
+    color: #ff5555;
+    border-left: 3px solid #ff5555;
+}
+
+.success-text {
+    color: #00ff9d;
+    border-left: 3px solid #00ff9d;
+}
+
+.info-text {
+    color: #4dabff;
+    border-left: 3px solid #4dabff;
+}
+
+.typing-text {
+    border-right: 2px solid var(--primary-accent);
+    animation: cursorBlink 0.8s infinite;
+}
+
+@keyframes cursorBlink {
+
+    0%,
+    100% {
+        border-color: transparent;
+    }
+
+    50% {
+        border-color: var(--primary-accent);
+    }
+}
+
+@media (max-width: 480px) {
+    .protocol-actions {
+        flex-direction: column;
+    }
+}
+
+/* Network Topology Map Styles - Forensic Focus */
+.topology-container {
+    margin: 30px 0;
+    padding: 25px;
+    background: rgba(0, 242, 234, 0.02);
+    border: 1px solid rgba(0, 242, 234, 0.2);
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.topology-header {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+    color: #00f2ea;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.topology-header::before {
+    content: "●";
+    animation: networkPulse 1.5s infinite;
+}
+
+@keyframes networkPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.4;
+        transform: scale(1.2);
+    }
+}
+
+.topology-map {
+    height: 250px;
+    width: 100%;
+    background:
+        radial-gradient(circle at center, rgba(0, 242, 234, 0.05) 0%, transparent 75%),
+        repeating-linear-gradient(rgba(255, 255, 255, 0.01) 0px, rgba(255, 255, 255, 0.01) 1px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.01) 0px, rgba(255, 255, 255, 0.01) 1px, transparent 1px, transparent 20px);
+    position: relative;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.node-circle {
+    fill: #050505;
+    stroke: #00f2ea;
+    stroke-width: 2.5;
+    transition: all 0.3s ease;
+}
+
+.node-text {
+    fill: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.edge-path {
+    fill: none;
+    stroke: #ff3b3b;
+    stroke-width: 2.5;
+    stroke-dasharray: 6, 6;
+    animation: flowNode 2.5s linear infinite;
+    filter: drop-shadow(0 0 3px rgba(255, 59, 59, 0.4));
+}
+
+@keyframes flowNode {
+    from {
+        stroke-dashoffset: 24;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.node-pulse {
+    animation: pulseNode 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes pulseNode {
+
+    0%,
+    100% {
+        r: 15;
+        stroke-width: 2.5;
+        stroke-opacity: 1;
+    }
+
+    50% {
+        r: 19;
+        stroke-width: 1.5;
+        stroke-opacity: 0.4;
     }
 }
